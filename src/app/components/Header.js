@@ -4,9 +4,9 @@ import ForestIcon from "@mui/icons-material/Forest"
 const Header = () => {
   return (
     <header className="fixed top-0 left-0 w-full flex items-center justify-between p-4 z-50 pr-16">
-      <div className="w-64"></div>
+      <div className="w-60"></div>
 
-      <nav className="flex justify-center space-x-5 text-black font-semibold text-[11px] bg-white py-1 pr-4 pl-1 rounded-full items-center">
+      <nav className="flex justify-center space-x-5 text-black font-semibold text-[14px] bg-white py-1 pr-4 pl-1 rounded-full items-center">
         <a
           href="/"
           className="bg-black text-white hover:text-green-600 rounded-full p-1 transition-all duration-200"
@@ -53,10 +53,10 @@ const Header = () => {
       </nav>
 
       <div className="flex space-x-2">
-        <button className="bg-white text-black px-4 py-2 rounded-3xl text-[11px] font-semibold transition">
+        <button className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
           Sign In
         </button>
-        <button className="bg-white text-black px-4 py-2 rounded-3xl text-[11px] font-semibold transition">
+        <button className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
           Sign Up
         </button>
       </div>
