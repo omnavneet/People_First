@@ -1,7 +1,8 @@
 import React from "react"
 import ForestIcon from "@mui/icons-material/Forest"
+import Link from "next/link"
 
-const Header = () => {
+const Navbar = () => {
   return (
     <header className="fixed top-0 left-0 w-full flex items-center justify-between p-4 z-50 pr-16">
       <div className="w-60"></div>
@@ -53,15 +54,15 @@ const Header = () => {
       </nav>
 
       <div className="flex space-x-2">
-        <button className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
+        <Link href={'/sign-in'} className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
           Sign In
-        </button>
-        <button className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
+        </Link>
+        <Link href={'/sign-up'} className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
           Sign Up
-        </button>
+        </Link>
       </div>
     </header>
   )
 }
 
-export default Header
+export default Navbar

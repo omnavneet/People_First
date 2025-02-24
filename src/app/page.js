@@ -1,11 +1,16 @@
-import Benefits from "./components/Benefits"
-import ContactForm from "./components/Contacts"
-import FAQ from "./components/FAQ"
-import Process from "./components/Process"
+import Navbar from "../components/Navbar"
+import Footer from "../components/Footer"
+import Benefits from "../components/Benefits"
+import ContactForm from "../components/Contacts"
+import FAQ from "../components/FAQ"
+import Process from "../components/Process"
+import Link from "next/link"
 
 export default function Home() {
   return (
     <div>
+      <Navbar />
+
       <section
         id="home"
         className="h-screen flex flex-col items-center justify-center text-center"
@@ -17,9 +22,12 @@ export default function Home() {
           People First is a website that connects those in need with the
           resources and support they need.
         </p>
-        <button className="bg-green-600 text-white text-[16px] px-6 py-2 rounded-full mt-5 font-semibold">
+        <Link
+          href={"/sign-up"}
+          className="bg-green-600 text-white text-[16px] px-6 py-2 rounded-full mt-5 font-semibold"
+        >
           Get Involved
-        </button>
+        </Link>
       </section>
 
       <section id="benefits" className="flex items-start justify-center pt-10">
@@ -50,19 +58,24 @@ export default function Home() {
         id="process"
         className="flex flex-col items-center justify-center text-center mt-4 max-w-2xl mx-auto"
       >
-          <Process />
+        <Process />
       </section>
 
       <section
         id="contact"
         className="flex flex-col items-center justify-center text-center mt-4 max-w-2xl mx-auto"
       >
-        <ContactForm/>
+        <ContactForm />
       </section>
 
-      <section id="faq" className="flex flex-col items-center justify-center text-center mt-4 max-w-3xl mx-auto">
-        <FAQ/>
+      <section
+        id="faq"
+        className="flex flex-col items-center justify-center text-center mt-4 max-w-3xl mx-auto"
+      >
+        <FAQ />
       </section>
+
+      <Footer />
     </div>
   )
 }

@@ -20,7 +20,7 @@ export default function Benefits() {
               key={index}
               className="flex flex-col items-start px-4 py-4 rounded-2xl shadow-md bg-white"
             >
-              <div className="flex mb-3">
+              <div className="flex mb-3 items-center justify-center">
                 <Icon
                   className={`${
                     color === "blue"

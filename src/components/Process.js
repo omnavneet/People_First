@@ -21,7 +21,7 @@ const Process = () => {
               key={index}
               className="flex flex-col items-start px-4 py-4 bg-white rounded-2xl shadow-md"
             >
-              <div className="flex mb-3">
+              <div className="flex mb-3 items-center justify-center">
                 <Icon
                   className={`${
                     color === "blue"
