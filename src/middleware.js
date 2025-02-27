@@ -2,18 +2,18 @@ import jwt from "jsonwebtoken"
 import { NextResponse } from "next/server"
 
 export const middleware = async (req) => {
-  const publicRoutes = ["/", "/sign-in", "/sign-up"]
+  const publicRoutes = ["/", "/api/auth/signup", "/api/auth/signin"]
   const path = req.nextUrl.pathname
 
   if (publicRoutes.includes(path)) {
-    return NextResponse.next()
+    return
   }
 
   const bearer = req.headers.get("authorization")
 
   if (!bearer) {
     console.log("No bearer")
-    NextResponse.redirect(new URL("/sign-in", req.url))
+    return NextResponse.redirect(new URL("/sign-in", req.url))
   }
 
   //bearer token
@@ -33,5 +33,6 @@ export const middleware = async (req) => {
 }
 
 export const config = {
-  matcher: "/api/Users",
+  matcher: ["/api/:path*", "/dashboard/:path*"],
+  runtime: "nodejs",
 }

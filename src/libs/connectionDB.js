@@ -2,20 +2,19 @@ import mongoose from "mongoose"
 
 let isConnected = false
 
-const connectionDB = async () => {
+export default async function connectionDB() {
   if (isConnected) {
-    console.log("Using existing connection")
-    return
+    console.log("Using existing database connection.")
+    return mongoose.connection
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGODB_URI)
-    isConnected = db.connections[0].readyState
-    console.log("New connection")
+    const db = await mongoose.connect(process.env.MONGODB_URL)
+
+    isConnected = db.connections[0].readyState === 1
+    console.log("✅ MongoDB connected successfully.")
     return db
-  } catch (err) {
-    console.log(err)
+  } catch (error) {
+    console.error("MongoDB connection error:", error)
   }
 }
-
-export default connectionDB
