@@ -10,7 +10,7 @@ const RequestSchema = new mongoose.Schema({
     status: { type: String, enum: ["open", "closed"], default: "open" },
     donationReceived: { type: Number, default: 0 },
     image: { type: String, required: false },
-    likes: {type: Number, default: 0},
+    likes: { type: Number, default: 0 },
 })
 
-export default mongoose.models.Request || mongoose.model("Request", RequestSchema)
+export default mongoose.models.Requests || mongoose.model("Requests", RequestSchema)

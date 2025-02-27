@@ -5,11 +5,11 @@ let isConnected = false
 const connectionDB = async () => {
   if (isConnected) {
     console.log("Using existing connection")
-    return mongoose.connection
+    return
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGO_URI)
+    const db = await mongoose.connect(process.env.MONGODB_URI)
     isConnected = db.connections[0].readyState
     console.log("New connection")
     return db
