@@ -7,7 +7,7 @@ const Navbar = () => {
     <header className="fixed top-0 left-0 w-full flex items-center justify-between p-4 z-50 pr-16">
       <div className="w-60"></div>
 
-      <nav className="flex justify-center space-x-5 text-black font-semibold text-[14px] bg-white py-1 pr-4 pl-1 rounded-full items-center">
+      <nav className="flex justify-center space-x-5 text-black font-semibold text-[14px] bg-white py-2 pr-6 pl-2 rounded-full items-center shadow-2xl">
         <a
           href="/"
           className="bg-black text-white hover:text-green-600 rounded-full p-1 transition-all duration-200"
@@ -54,11 +54,11 @@ const Navbar = () => {
       </nav>
 
       <div className="flex space-x-2">
-        <Link href={'/sign-in'} className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
+        <Link
+          href={"/sign-in"}
+          className="bg-white hover:bg-gray-200 text-black px-8 py-2 rounded-2xl text-[14px] font-semibold transition"
+        >
           Sign In
-        </Link>
-        <Link href={'/sign-up'} className="bg-white text-black px-4 py-2 rounded-3xl text-[14px] font-semibold transition">
-          Sign Up
         </Link>
       </div>
     </header>

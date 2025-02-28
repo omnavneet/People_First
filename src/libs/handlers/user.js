@@ -6,7 +6,12 @@ import { comparePasswords, createJWT } from "../auth"
 export const createNewUser = async (req) => {
   await connectionDB()
 
-  const { name, password, email, profilePicture } = await req.json()
+  const formData = await req.formData()
+
+  const userName = formData.get("userName")
+  const password = formData.get("password")
+  const email = formData.get("email")
+  const profilePicture = formData.get("profilePicture")
 
   const existingUser = await User.findOne({ email })
   if (existingUser) {
@@ -16,10 +21,10 @@ export const createNewUser = async (req) => {
   const hashPassword = await bcrypt.hash(password, 5)
 
   const user = new User({
-    name,
+    name: userName,
     email,
     password: hashPassword,
-    profilePicture,
+    profilePicture: profilePicture || null,
   })
 
   await user.save()
@@ -31,7 +36,10 @@ export const createNewUser = async (req) => {
 export const signin = async (req) => {
   await connectionDB()
 
-  const { name, password } = await req.json()
+  const formData = await req.formData()
+
+  const name = formData.get("userName")
+  const password = formData.get("password")
 
   const user = await User.findOne({ name })
 

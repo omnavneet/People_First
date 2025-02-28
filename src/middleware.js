@@ -33,6 +33,6 @@ export const middleware = async (req) => {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/dashboard/:path*"],
+  matcher: ["/api/:path*"],
   runtime: "nodejs",
 }

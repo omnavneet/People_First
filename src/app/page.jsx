@@ -24,7 +24,7 @@ export default function Home() {
         </p>
         <Link
           href={"/sign-up"}
-          className="bg-green-600 text-white text-[16px] px-6 py-2 rounded-full mt-5 font-semibold"
+          className="bg-green-600 hover:bg-green-700 text-white text-[16px] px-6 py-2 rounded-lg mt-5 font-semibold shadow-2xl"
         >
           Get Involved
         </Link>

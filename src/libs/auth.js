@@ -13,7 +13,7 @@ export const createJWT = (user) => {
   const token = jwt.sign(
     {
       id: user.id,
-      username: user.username,
+      userName: user.userName,
     },
     process.env.JWT_SECRET
   )
