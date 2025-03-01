@@ -10,20 +10,6 @@ const updateUserSchema = z.object({
   profilePicture: z.string().url("Invalid URL format").optional(),
 })
 
-//Get User By ID
-export async function GET(req, { params }) {
-  await connectionDB()
-  const { id } = params
-
-  try {
-    const user = await User.findById(id)
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
-    return NextResponse.json(user)
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-}
 
 //Update User By ID
 export async function PUT(req, { params }) {

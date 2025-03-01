@@ -12,10 +12,13 @@ export const hashPassword = (password) => {
 export const createJWT = (user) => {
   const token = jwt.sign(
     {
-      id: user.id,
+      _id: user._id,
       userName: user.userName,
     },
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "24h",
+    }
   )
   return token
 }

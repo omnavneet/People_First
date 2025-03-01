@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 const signIn = () => {
+
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
@@ -34,7 +35,6 @@ const signIn = () => {
                 return
             }
 
-            localStorage.setItem("token", data.token)
             router.push("/dashboard")
             console.log(data)
         } catch (error) {

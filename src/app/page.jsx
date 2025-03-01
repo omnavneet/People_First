@@ -23,7 +23,7 @@ export default function Home() {
           resources and support they need.
         </p>
         <Link
-          href={"/sign-up"}
+          href={"/check_signup"}
           className="bg-green-600 hover:bg-green-700 text-white text-[16px] px-6 py-2 rounded-lg mt-5 font-semibold shadow-2xl"
         >
           Get Involved

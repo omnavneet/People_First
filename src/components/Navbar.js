@@ -55,7 +55,7 @@ const Navbar = () => {
 
       <div className="flex space-x-2">
         <Link
-          href={"/sign-in"}
+          href={"/check_signin"}
           className="bg-white hover:bg-gray-200 text-black px-8 py-2 rounded-2xl text-[14px] font-semibold transition"
         >
           Sign In

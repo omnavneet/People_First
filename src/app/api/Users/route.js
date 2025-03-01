@@ -21,7 +21,7 @@ export async function POST(req) {
     const user = await User.create(validatedData)
     return NextResponse.json(user)
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message })
   }
 }
 
@@ -31,3 +31,4 @@ export async function GET() {
   const users = await User.find()
   return NextResponse.json(users)
 }
+

@@ -2,6 +2,8 @@ import connectionDB from "../connectionDB"
 import User from "../../../models/User"
 import bcrypt from "bcrypt"
 import { comparePasswords, createJWT } from "../auth"
+import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
 
 export const createNewUser = async (req) => {
   await connectionDB()
@@ -15,7 +17,7 @@ export const createNewUser = async (req) => {
 
   const existingUser = await User.findOne({ email })
   if (existingUser) {
-    return new Response(JSON.stringify({ error: "User already exists" }))
+    return NextResponse.json({ error: "User already exists" })
   }
 
   const hashPassword = await bcrypt.hash(password, 5)
@@ -30,10 +32,20 @@ export const createNewUser = async (req) => {
   await user.save()
 
   const token = createJWT(user)
-  return new Response(JSON.stringify({ token }))
+
+  const cookieStore = await cookies()
+  cookieStore.set("auth_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60, // 7 days
+  })
+
+  return NextResponse.json({ token })
 }
 
 export const signin = async (req) => {
+
   await connectionDB()
 
   const formData = await req.formData()
@@ -44,15 +56,24 @@ export const signin = async (req) => {
   const user = await User.findOne({ name })
 
   if (!user) {
-    return new Response(JSON.stringify({ error: "User not found" }))
+    return NextResponse.json({ error: "User not found" })
   }
 
   const isValid = await comparePasswords(password, user.password)
 
   if (!isValid) {
-    return new Response(JSON.stringify({ error: "Invalid credentials" }))
+    return NextResponse.json({ error: "Invalid credentials" })
   }
 
   const token = createJWT(user)
-  return new Response(JSON.stringify({ token }))
+
+  const cookieStore = await cookies()
+  cookieStore.set("auth_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60, // 7 days
+  })
+
+  return NextResponse.json({ token })
 }

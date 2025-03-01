@@ -41,7 +41,8 @@ const signUp = () => {
                 return
             }
 
-            localStorage.setItem("token", data.token)
+            const token = data.token
+
             console.log("User created successfully")
             router.push("/dashboard")
         } catch (error) {

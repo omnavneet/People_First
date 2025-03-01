@@ -1,38 +1,43 @@
-import jwt from "jsonwebtoken"
 import { NextResponse } from "next/server"
+import { cookies } from "next/headers"
+import { jwtVerify } from "jose"
 
 export const middleware = async (req) => {
   const publicRoutes = ["/", "/api/auth/signup", "/api/auth/signin"]
   const path = req.nextUrl.pathname
 
   if (publicRoutes.includes(path)) {
-    return
+    return NextResponse.next()
   }
 
-  const bearer = req.headers.get("authorization")
+  const cookie = (await cookies(req)).get("auth_token")
+  const token = cookie?.value
 
-  if (!bearer) {
-    console.log("No bearer")
-    return NextResponse.redirect(new URL("/sign-in", req.url))
-  }
-
-  //bearer token
-  const [, token] = bearer.split(" ")
-
-  if (!token) {
+  if (token === null) {
     console.log("No token")
     return NextResponse.redirect(new URL("/sign-in", req.url))
   }
 
+  const url = req.url
+  if (url.includes("/sign-in") && token) {
+    return NextResponse.redirect(new URL("/dashboard", req.url))
+  }
+
   try {
-    jwt.verify(token, process.env.JWT_SECRET)
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(process.env.JWT_SECRET)
+    )
+
+    console.log(payload)
+
     return NextResponse.next()
   } catch (error) {
+    console.error(error)
     return NextResponse.redirect(new URL("/sign-in", req.url))
   }
 }
 
 export const config = {
-  matcher: ["/api/:path*"],
-  runtime: "nodejs",
+  matcher: ["/dashboard", "/events", "/requests", "/api/:path*"],
 }
