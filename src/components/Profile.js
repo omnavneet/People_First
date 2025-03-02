@@ -27,16 +27,16 @@ const Profile = () => {
   }
 
   return (
-    <div className="flex items-center space-x-8">
+    <div className="flex items-center space-x-10">
       <button
         onClick={handleProfile}
-        className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
+        className="text-blue-500 hover:text-blue-700 transition-colors duration-200 scale-125"
       >
         <AccountCircle fontSize="medium" />
       </button>
       <button
         onClick={handleLogout}
-        className="text-red-500 hover:text-red-700 transition-colors duration-200"
+        className="text-red-500 hover:text-red-700 transition-colors duration-200 scale-125"
       >
         <Logout fontSize="medium" />
       </button>

@@ -9,19 +9,23 @@ export async function GET(req) {
   await connectionDB()
   const cookie = (await cookies(req)).get("auth_token")
   const token = cookie.value
+  console.log(cookie)
 
   if (!token) {
     return NextResponse.json({ error: "No token provided" })
   }
+  console.log(token)
 
   try {
     const { payload } = await jwtVerify(
       token,
       new TextEncoder().encode(process.env.JWT_SECRET)
     )
-    const { id } = payload
+    const { _id } = payload
+    const id = _id
 
     const user = await User.findById(id)
+    console.log(user)
     if (!user) {
       return NextResponse.json({ error: "User not found" })
     }

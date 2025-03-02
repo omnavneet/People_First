@@ -3,12 +3,13 @@ import Footer from "../../components/Footer"
 import DashboardNavbar from "@/components/DashboardNavbar"
 
 const dashboard = ({ children }) => {
-
   return (
-    <div className="w-full h-screen bg-black text-white">
+    <div className="min-h-screen bg-[url('/wave.png')] bg-cover bg-center">
       <DashboardNavbar />
       <div>{children}</div>
-      <Footer />
+      <div className="fixed bottom-0 w-full">
+        <Footer />
+      </div>
     </div>
   )
 }

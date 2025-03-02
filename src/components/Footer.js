@@ -27,7 +27,7 @@ const Footer = () => {
         >
           <Box mb={{ xs: 2, md: 0 }} textAlign="left">
             <div className="flex items-center gap-x-2">
-              <ForestIcon fontSize="small" sx={{ color: "green" }}/>
+              <ForestIcon fontSize="small" sx={{ color: "green" }} />
               <Typography variant="h6" fontWeight="bold">
                 PeopleFirst
               </Typography>
