@@ -23,7 +23,7 @@ const DashboardNavbar = () => {
           </span>
         </Link>
 
-        <div className="flex space-x-16">
+        <div className="flex space-x-20">
           {navItems.map((item, index) => (
             <Link
               key={index}
