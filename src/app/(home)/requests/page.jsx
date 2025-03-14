@@ -1,10 +1,10 @@
 "use client"
 import React, { useState, useEffect } from "react"
-import { useRouter } from "next/navigation" // For Next.js 13+ with App Router
+import { useRouter } from "next/navigation"
 
 const Page = () => {
   const [requests, setRequests] = useState([])
-  const router = useRouter() // Initialize the router
+  const router = useRouter() 
 
   useEffect(() => {
     const fetchRequests = async () => {

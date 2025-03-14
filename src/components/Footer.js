@@ -5,7 +5,6 @@ import {
   Box,
   IconButton,
   Link,
-  Divider,
 } from "@mui/material"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
@@ -15,7 +14,7 @@ const Footer = () => {
   return (
     <Box
       component="footer"
-      sx={{ bgcolor: "#cccecf", color: "#333", py: 3, mt: 4 }}
+      sx={{ bgcolor: "#e6e6e6", color: "#333", py: 3, mt: 4 }}
     >
       <Container maxWidth="lg">
         <Box

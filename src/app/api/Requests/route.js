@@ -15,7 +15,7 @@ export async function POST(req) {
   const data = await req.json()
 
   try {
-    const request = await Requests.create(validatedData)
+    const request = await Requests.create(data)
     return NextResponse.json({ success: true, request })
   } catch (error) {
     return NextResponse.json({ error: error.message })
