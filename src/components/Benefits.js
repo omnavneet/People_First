@@ -1,46 +1,64 @@
+import { motion } from "framer-motion"
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism"
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch"
 import SmartphoneIcon from "@mui/icons-material/Smartphone"
 import HandshakeIcon from "@mui/icons-material/Handshake"
 
 export default function Benefits() {
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  }
+
   return (
-    <section className="py-10">
-      <div className="text-center max-w-5xl mx-auto">
-        <h2 className="text-5xl font-bold text-black">Why PeopleFirst?</h2>
-        <p className="text-black text-[16px] font-semibold mt-3">
+    <section className="py-16 w-full max-w-6xl mx-auto px-4">
+      <motion.div 
+        className="text-center"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+      >
+        <h2 className="text-4xl md:text-5xl font-bold text-black mb-3">Why PeopleFirst?</h2>
+        <p className="text-gray-700 text-lg font-medium mb-12">
           Empowering change, one step at a time.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8 max-w-2xl mx-auto">
-        {benefitItems.map(
-          ({ icon: Icon, title, description, color }, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-start px-4 py-4 rounded-2xl shadow-md bg-white"
-            >
-              <div className="flex mb-3 items-center justify-center">
-                <Icon
-                  className={`${
-                    color === "blue"
-                      ? "text-blue-500"
-                      : color === "green"
-                      ? "text-green-500"
-                      : color === "yellow"
-                      ? "text-yellow-500"
-                      : color === "red"
-                      ? "text-red-500"
-                      : "text-gray-500"
-                  } text-4xl mr-3`}
-                />
-                <h3 className="text-2xl font-bold text-black">{title}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {benefitItems.map(({ icon: Icon, title, description, color }, index) => (
+          <motion.div
+            key={index}
+            className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            whileHover={{ y: -5 }}
+          >
+            <div className={`h-2 ${
+              color === "blue" ? "bg-blue-500" :
+              color === "green" ? "bg-green-500" :
+              color === "yellow" ? "bg-yellow-500" :
+              "bg-red-500"
+            }`}></div>
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className={`p-3 rounded-full mr-4 ${
+                  color === "blue" ? "bg-blue-100 text-blue-600" :
+                  color === "green" ? "bg-green-100 text-green-600" :
+                  color === "yellow" ? "bg-yellow-100 text-yellow-600" :
+                  "bg-red-100 text-red-600"
+                }`}>
+                  <Icon fontSize="large" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">{title}</h3>
               </div>
-              <div className="w-full border-b-4 border-dotted border-gray-400 mb-3"></div>
-              <p className="text-black text-[16px]">{description}</p>
+              <p className="text-gray-600 leading-relaxed">{description}</p>
             </div>
-          )
-        )}
+          </motion.div>
+        ))}
       </div>
     </section>
   )

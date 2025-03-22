@@ -1,7 +1,11 @@
+"use client"
 import React from "react"
 import ForestIcon from "@mui/icons-material/Forest"
-import Profile from "./Profile"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { motion } from "framer-motion"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
+import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
@@ -9,36 +13,68 @@ const navItems = [
   { name: "Events", href: "/events" },
 ]
 
-const DashboardNavbar = () => {
+const Sidebar = () => {
+  const pathname = usePathname()
+
   return (
-    <nav className="py-10">
-      <div className="container mx-auto flex items-center justify-between px-4">
-        <Link
-          href="/"
-          className="flex items-center space-x-2 text-green-600 transition-all duration-200"
-        >
-          <ForestIcon fontSize="medium" />
-          <span className="text-gray-700 hover:text-black text-xl font-bold">
+    <div className="h-screen w-64 fixed left-0 top-0 bg-gray-100 shadow-md flex flex-col">
+      {/* Logo section */}
+      <div className="p-6 border-b">
+        <Link href="/" className="flex items-center space-x-2 group">
+          <div className="p-2 rounded-full bg-green-50 text-green-600 group-hover:bg-green-100 transition-all duration-200">
+            <ForestIcon fontSize="medium" />
+          </div>
+          <span className="text-gray-800 group-hover:text-green-600 text-xl font-bold transition-all duration-200">
             PeopleFirst
           </span>
         </Link>
-
-        <div className="flex space-x-20">
-          {navItems.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              className="font-semibold text-lg text-gray-700 hover:text-black transition-all duration-100"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
-
-        <Profile />
       </div>
-    </nav>
+
+      {/* Navigation links */}
+      <div className="flex-1 py-6">
+        <div className="flex flex-col space-y-2 px-4">
+          {navItems.map((item, index) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={index}
+                href={item.href}
+                className={`relative font-medium text-base py-3 px-4 rounded-lg ${
+                  isActive
+                    ? "text-green-600 bg-green-50"
+                    : "text-gray-600 hover:text-green-600 hover:bg-gray-50"
+                } transition-all duration-200`}
+              >
+                {item.name}
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Profile and Logout section */}
+      <div className="p-4 border-t mt-auto space-y-3">
+        <Link
+          href="/profile"
+          className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-all duration-200"
+        >
+          <div className="bg-green-100 p-2 rounded-full">
+            <AccountCircleIcon fontSize="small" className="text-green-600" />
+          </div>
+          <span className="font-medium text-gray-800">Profile</span>
+        </Link>
+
+        <motion.button
+          className="w-full flex items-center space-x-3 p-3 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all duration-200"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <ExitToAppIcon fontSize="small" className="ml-2" />
+          <span className="font-medium">Logout</span>
+        </motion.button>
+      </div>
+    </div>
   )
 }
 
-export default DashboardNavbar
+export default Sidebar

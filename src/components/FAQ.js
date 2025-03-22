@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function FAQ() {
   const faqs = [
@@ -48,34 +49,66 @@ export default function FAQ() {
   }
 
   return (
-    <section id="faq" className="max-w-lg mx-auto py-20 px-5">
-      <h2 className="text-5xl font-bold text-black">FAQs</h2>
-      <p className="text-black text-[16px] font-semibold mt-3">
-        Find answers to common questions about PeopleFirst.
-      </p>
+    <section className="py-16 w-full max-w-6xl mx-auto px-4">
+      <motion.div
+        className="text-center mb-12"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+      >
+        <h2 className="text-4xl md:text-5xl font-bold text-black mb-3">FAQs</h2>
+        <p className="text-gray-700 text-lg font-medium">
+          Find answers to common questions about PeopleFirst.
+        </p>
+      </motion.div>
 
-      <div className="mt-8 space-y-3">
+      <div className="max-w-3xl mx-auto">
         {faqs.map((faq, index) => (
-          <div
+          <motion.div
             key={index}
-            className="border bg-white px-4 py-2 shadow-sm shadow-pink-100 transition-all rounded-2xl"
+            className="mb-4"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+            viewport={{ once: true }}
           >
-            <button
-              className="w-full text-left flex justify-between items-center font-semibold text-black text-lg focus:outline-none"
-              onClick={() => toggleFAQ(index)}
-            >
-              <span className="text-left">{faq.question}</span>{" "}
-              <span className="text-xl text-black ">{openIndex === index ? "−" : "+"}</span>
-            </button>
-
-            <div
-              className={`overflow-hidden transition-all duration-300 ${
-                openIndex === index ? "max-h-screen" : "max-h-0"
+            <div 
+              className={`border bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${
+                openIndex === index ? "shadow-md" : "hover:shadow-md"
               }`}
             >
-              <p className="mt-2 text-black">{faq.answer}</p>
+              <button
+                className="w-full text-left flex justify-between items-center p-5 focus:outline-none"
+                onClick={() => toggleFAQ(index)}
+              >
+                <span className="font-semibold text-gray-800">{faq.question}</span>
+                <motion.span
+                  animate={{ rotate: openIndex === index ? 45 : 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-green-600 text-2xl"
+                >
+                  +
+                </motion.span>
+              </button>
+
+              <AnimatePresence>
+                {openIndex === index && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-5 pt-0 border-t border-gray-100 text-gray-600">
+                      {faq.answer}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>
