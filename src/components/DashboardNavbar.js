@@ -17,7 +17,7 @@ const Sidebar = () => {
   const pathname = usePathname()
 
   return (
-    <div className="h-screen w-64 fixed left-0 top-0 bg-gray-100 shadow-md flex flex-col">
+    <div className="h-screen w-64 fixed left-0 top-0 bg-green-100 shadow-md flex flex-col">
       {/* Logo section */}
       <div className="p-6 border-b">
         <Link href="/" className="flex items-center space-x-2 group">
@@ -41,8 +41,8 @@ const Sidebar = () => {
                 href={item.href}
                 className={`relative font-medium text-base py-3 px-4 rounded-lg ${
                   isActive
-                    ? "text-green-600 bg-green-50"
-                    : "text-gray-600 hover:text-green-600 hover:bg-gray-50"
+                    ? "bg-green-600 text-white"
+                    : "text-black hover:bg-green-200"
                 } transition-all duration-200`}
               >
                 {item.name}
@@ -56,7 +56,7 @@ const Sidebar = () => {
       <div className="p-4 border-t mt-auto space-y-3">
         <Link
           href="/profile"
-          className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-all duration-200"
+          className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-green-200 transition-all duration-200"
         >
           <div className="bg-green-100 p-2 rounded-full">
             <AccountCircleIcon fontSize="small" className="text-green-600" />
@@ -65,7 +65,7 @@ const Sidebar = () => {
         </Link>
 
         <motion.button
-          className="w-full flex items-center space-x-3 p-3 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all duration-200"
+          className="w-full flex items-center space-x-3 p-3 rounded-lg bg-red-200 text-red-600 transition-all duration-200"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >

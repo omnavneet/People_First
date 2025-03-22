@@ -8,8 +8,6 @@ const Home = () => {
   const [events, setEvents] = useState(null)
   const [requests, setRequests] = useState(null)
   const [userloading, setUserLoading] = useState(true)
-  const [requestLoading, setRequestLoading] = useState(true)
-  const [eventLoading, setEventLoading] = useState(true)
 
   const router = useRouter()
 
@@ -40,6 +38,11 @@ const Home = () => {
         const response = await fetch("/api/Events", {
           method: "GET",
         })
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch events")
+        }
+
         const data = await response.json()
         const recentEvents = data
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -47,23 +50,30 @@ const Home = () => {
         setEvents(recentEvents)
       } catch (e) {
         console.log(e)
-        setEventLoading(false)
       }
     }
-
     fetchEvents()
   }, [])
 
   useEffect(() => {
     const fetchRequests = async () => {
-      const response = await fetch("/api/Requests", {
-        method: "GET",
-      })
-      const data = await response.json()
-      const recentRequests = data
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 3)
-      setRequests(recentRequests)
+      try {
+        const response = await fetch("/api/Requests", {
+          method: "GET",
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch requests")
+        }
+
+        const data = await response.json()
+        const recentRequests = data
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 3)
+        setRequests(recentRequests)
+      } catch (e) {
+        console.log(e)
+      }
     }
     fetchRequests()
   }, [])
@@ -75,7 +85,7 @@ const Home = () => {
   )
 
   return (
-    <div className="flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 bg-gray-50 min-h-screen">
+    <div className="flex flex-col justify-center py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-gray-50 min-h-screen">
       <motion.header
         className="text-center mb-8"
         initial={{ opacity: 0, y: -20 }}
@@ -99,7 +109,7 @@ const Home = () => {
 
       {/* Stats Row */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+        className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, staggerChildren: 0.1 }}
@@ -147,7 +157,7 @@ const Home = () => {
         </motion.div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         {/* Events Section */}
         <motion.div
           className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 p-6 border border-gray-100"
@@ -309,22 +319,6 @@ const Home = () => {
         </motion.div>
 
         <div className="space-y-6">
-          {/* Money Raised Card
-          <motion.div
-            className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-          >
-            <h2 className="text-xl font-semibold mb-2">Making a Difference</h2>
-            <p className="text-5xl font-bold mb-4">
-              ₹{TotalDonationReceived?.toLocaleString() || "0"}
-            </p>
-            <p className="text-sm opacity-90">
-              Funds raised to help people in need
-            </p>
-          </motion.div> */}
 
           {/* Quick Actions */}
           <motion.div
@@ -336,22 +330,22 @@ const Home = () => {
             <h2 className="text-xl font-semibold mb-4 text-gray-800">
               Quick Actions
             </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-2 gap-3">
               <motion.button
-                onClick={() => router.push("/donate")}
+                onClick={() => router.push("/requests/new")}
                 className="p-3 bg-blue-50 rounded-xl text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"
                 whileHover={{ scale: 1.05, backgroundColor: "#dbeafe" }}
                 whileTap={{ scale: 0.98 }}
               >
-                Make a Donation
+                Create a Request
               </motion.button>
               <motion.button
-                onClick={() => router.push("/volunteer")}
+                onClick={() => router.push("/events/new")}
                 className="p-3 bg-green-50 rounded-xl text-green-700 text-sm font-medium hover:bg-green-100 transition-colors"
                 whileHover={{ scale: 1.05, backgroundColor: "#dcfce7" }}
                 whileTap={{ scale: 0.98 }}
               >
-                Volunteer
+                Create an Event
               </motion.button>
               <motion.button
                 onClick={() => router.push("/share")}
