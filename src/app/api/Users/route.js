@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import User from "../../../../models/User"
+import User from "../../../../models/Users"
 import connectionDB from "../../../libs/connectionDB"
 import { z } from "zod"
 

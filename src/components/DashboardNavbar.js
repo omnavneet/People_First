@@ -6,11 +6,14 @@ import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
+import SmartToyIcon from "@mui/icons-material/SmartToy"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Requests", href: "/requests" },
   { name: "Events", href: "/events" },
+  { name: "Community", href: "/community" },
+  { name: "AI Companion", href: "/ai-companion" },
 ]
 
 const Sidebar = () => {
@@ -45,7 +48,19 @@ const Sidebar = () => {
                     : "text-black hover:bg-green-200"
                 } transition-all duration-200`}
               >
-                {item.name}
+                {item.href === "/ai-companion" ? (
+                  <>
+                    <div className="flex items-center gap-1">
+                      <SmartToyIcon
+                        fontSize="small"
+                        className="text-cyan-600"
+                      />
+                      {item.name}
+                    </div>
+                  </>
+                ) : (
+                  item.name
+                )}
               </Link>
             )
           })}

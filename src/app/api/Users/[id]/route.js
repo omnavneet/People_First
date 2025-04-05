@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import User from "../../../../models/User"
+import User from "../../../../../models/Users"
 import connectionDB from "../../../../libs/connectionDB"
 import { z } from "zod"
 
@@ -10,6 +10,21 @@ const updateUserSchema = z.object({
   profilePicture: z.string().url("Invalid URL format").optional(),
 })
 
+//Get UserData by ID
+export async function GET(req, { params }) {
+  await connectionDB()
+  const { id } = params
+
+  try {
+    const user = await User.findById(id)
+    console.log(user)
+    if (!user)
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    return NextResponse.json(user)
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
 
 //Update User By ID
 export async function PUT(req, { params }) {

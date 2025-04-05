@@ -10,7 +10,7 @@ import { motion } from "framer-motion"
 
 export default function Home() {
   return (
-    <div className="overflow-x-hidden bg-gray-50">
+    <div className="overflow-x-hidden bg-green-100">
       <Navbar />
 
       <section

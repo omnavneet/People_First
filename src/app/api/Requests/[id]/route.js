@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import Requests from "../../../../models/Requests"
+import Requests from "../../../../../models/Requests"
 import connectionDB from "../../../../libs/connectionDB"
 import { z } from "zod"
 import mongoose from "mongoose"
