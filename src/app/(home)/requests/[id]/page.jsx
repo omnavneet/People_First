@@ -2,7 +2,6 @@
 import { useParams, useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { set } from "mongoose"
 
 const Page = () => {
   const { id } = useParams()
@@ -34,9 +33,9 @@ const Page = () => {
           method: "GET",
         })
         const data = await response.json()
-        console.log(data)
+
         setRequest(data)
-        setRequestMakerID(data.user)
+        setRequestMakerID(data.user._id)
       } catch (e) {
         console.error("Error fetching request:", e)
       }
@@ -45,6 +44,10 @@ const Page = () => {
   }, [id])
 
   const handleDelete = async () => {
+    if (requestMakerID !== userID) {
+      return
+    }
+
     try {
       await fetch(`/api/Requests/${id}`, {
         method: "DELETE",
@@ -108,11 +111,11 @@ const Page = () => {
         {request.image ? (
           <motion.img
             src={request.image}
-            alt={request.title || "Request Image"}
+            alt={request.title}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="w-full h-80 object-cover rounded-lg"
+            className="w-full h-full object-cover rounded-lg"
           />
         ) : (
           <motion.div
@@ -253,7 +256,7 @@ const Page = () => {
           </motion.div>
         </motion.div>
         {/* Admin Action Buttons */}
-        {userID === requestMakerID && (
+        {userID && userID === requestMakerID && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

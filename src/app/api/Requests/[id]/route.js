@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import Requests from "../../../../../models/Requests"
+import Users from "../../../../../models/Users"
 import connectionDB from "../../../../libs/connectionDB"
 import { z } from "zod"
 import mongoose from "mongoose"
@@ -32,7 +33,11 @@ export async function GET(req, { params }) {
   const { id } = params
 
   try {
-    const request = await Requests.findById(id)
+    const request = await Requests.findById(id).populate(
+      "user",
+      "name profilePicture"
+    )
+
     if (!request) {
       return NextResponse.json({ error: "Request not found" }, { status: 404 })
     }

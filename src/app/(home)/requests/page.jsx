@@ -172,18 +172,6 @@ const Page = () => {
                       {Math.round(progressPercentage)}% funded
                     </div>
                   </div>
-
-                  <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                    {request.createdAt && (
-                      <span>
-                        Created{" "}
-                        {new Date(request.createdAt).toLocaleDateString()}
-                      </span>
-                    )}
-                    <span className="text-blue-600 font-medium">
-                      View Details →
-                    </span>
-                  </div>
                 </div>
               </motion.div>
             )

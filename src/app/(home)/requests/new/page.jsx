@@ -19,7 +19,7 @@ const Page = () => {
     title: z.string().min(5).max(100),
     description: z.string().min(20),
     donationGoal: z.number().positive(), // Change string to number
-    image: z.string().optional(),
+    image: z.any(),
   })
 
   useEffect(() => {
@@ -46,11 +46,19 @@ const Page = () => {
   }, [])
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setNewRequest((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    const { name, value, type, files } = e.target
+
+    if (type === "file" && files[0]) {
+      setNewRequest((prev) => ({
+        ...prev,
+        [name]: files[0],
+      }))
+    } else {
+      setNewRequest((prev) => ({
+        ...prev,
+        [name]: value,
+      }))
+    }
   }
 
   const handleNewRequest = async () => {
@@ -59,22 +67,57 @@ const Page = () => {
       return
     }
 
-    // Validate form data
     try {
+      // Validate form data (except the file)
       InputSchema.parse({
         ...newRequest,
-        donationGoal: parseFloat(newRequest.donationGoal), // Convert donationGoal to number
+        donationGoal: parseFloat(newRequest.donationGoal),
       })
-      setError(null) // Reset errors if validation passes
+      setError(null)
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError(error.errors)
+        console.error("Validation error:", error.errors)
         return
       }
     }
 
-    // Proceed to create request if validation is successful
     try {
+      // Upload the image to S3 using the server-side endpoint
+      let imageUrl = ""
+
+      if (newRequest.image instanceof File) {
+        // Step 1: Get the signed URL from the backend
+        const presignedUrlRes = await fetch("/api/upload_image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fileName: newRequest.image.name,
+            fileType: newRequest.image.type,
+          }),
+        })
+
+        if (!presignedUrlRes.ok) {
+          const errorText = await presignedUrlRes.text()
+          throw new Error(`Failed to get signed URL: ${errorText}`)
+        }
+
+        const { imageUrl: publicUrl } = await presignedUrlRes.json()
+
+        console.log("Image uploaded successfully")
+        imageUrl = publicUrl // Use the public URL for viewing
+      }
+
+      // Send final data to /api/Requests
+      console.log("Creating request with data:", {
+        ...newRequest,
+        image: imageUrl,
+        donationGoal: parseFloat(newRequest.donationGoal),
+        user: userId,
+      })
+
       const response = await fetch("/api/Requests", {
         method: "POST",
         headers: {
@@ -82,26 +125,29 @@ const Page = () => {
         },
         body: JSON.stringify({
           ...newRequest,
+          image: imageUrl, // Include the public URL for viewing
+          donationGoal: parseFloat(newRequest.donationGoal),
           user: userId,
         }),
       })
 
       if (!response.ok) {
-        console.error("Error creating request:", response.statusText)
-        return
+        const errorText = await response.text()
+        throw new Error(`Request creation failed: ${errorText}`)
       }
 
       const data = await response.json()
-      const id = data.request._id
-      router.push(`/requests/${id}`)
+      console.log("Request created successfully:", data)
+      router.push(`/requests/${data.request._id}`)
     } catch (error) {
       console.error("Error creating request:", error)
+      setError(error.message)
     }
   }
 
   return (
     <div className="p-4 md:p-8 lg:px-32 bg-gray-50 min-h-screen">
-      <div className="w-full max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-gray-100">
+      <div className="w-full max-w-4xl mx-auto p-6 md:p-10 bg-green-50 rounded-2xl shadow-xl border border-gray-100">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-8 text-center">
           Create New Request
         </h2>
@@ -185,14 +231,18 @@ const Page = () => {
                 Image URL (Optional)
               </label>
               <input
-                type="text"
+                type="file"
                 name="image"
-                value={newRequest.image}
-                onChange={handleInputChange}
+                accept="image/*"
+                onChange={(e) =>
+                  setNewRequest((prev) => ({
+                    ...prev,
+                    image: e.target.files[0], // store the File object
+                  }))
+                }
                 className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
               />
             </div>
-
             {/* Status */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">

@@ -1,5 +1,5 @@
 import connectionDB from "../connectionDB"
-import User from "../../../models/User"
+import User from "../../../models/Users"
 import bcrypt from "bcrypt"
 import { comparePasswords, createJWT } from "../auth"
 import { cookies } from "next/headers"
