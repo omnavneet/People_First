@@ -36,6 +36,13 @@ const Page = () => {
     return Math.min(percentage, 100) // Cap at 100%
   }
 
+  // Set status based on donation received and goal
+  const calculateStatus = (received, goal) => {
+    if (received >= goal) return "fulfilled"
+    if (received < goal && received > 0) return "active"
+    return "urgent"
+  }
+
   return (
     <div className="px-2 py-8 max-w-6xl mx-auto bg-green-50 min-h-screen">
       <motion.header
@@ -101,6 +108,10 @@ const Page = () => {
               request.donationReceived,
               request.donationGoal
             )
+            const requestStatus = calculateStatus(
+              request.donationReceived,
+              request.donationGoal
+            )
 
             return (
               <motion.div
@@ -134,16 +145,17 @@ const Page = () => {
                       {request.title}
                     </h3>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full font-medium ${request.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : request.status === "fulfilled"
-                            ? "bg-blue-100 text-blue-800"
-                            : request.status === "urgent"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-gray-100 text-gray-800"
-                        }`}
+                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        requestStatus === "active"
+                          ? "bg-blue-200 text-green-800"
+                          : requestStatus === "fulfilled"
+                          ? "bg-green-200 text-blue-800"
+                          : requestStatus === "urgent"
+                          ? "bg-red-200 text-red-800"
+                          : "bg-gray-200 text-gray-800"
+                      }`}
                     >
-                      {request.status}
+                      {requestStatus}
                     </span>
                   </div>
 

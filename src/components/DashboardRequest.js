@@ -34,7 +34,18 @@ const DashboardRequest = () => {
     fetchRequests()
   }, [])
 
-  
+  // Calculate donation progress percentage
+  const getProgressPercentage = (received, goal) => {
+    const percentage = (received / goal) * 100
+    return Math.min(percentage, 100) // Cap at 100%
+  }
+
+  // Set status based on donation received and goal
+  const calculateStatus = (received, goal) => {
+    if (received >= goal) return "fulfilled"
+    if (received < goal && received > 0) return "active"
+    return "urgent"
+  }
 
   return (
     <div>
@@ -63,49 +74,60 @@ const DashboardRequest = () => {
           </div>
         ) : requests?.length > 0 ? (
           <div className="space-y-4">
-            {requests.map((request, index) => (
-              <motion.div
-                key={request._id}
-                onClick={() => router.push(`/requests/${request._id}`)}
-                className="p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-150 border border-blue-100 hover:bg-blue-50 cursor-pointer"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-semibold text-gray-800 truncate">
-                    {request.title}
-                  </h3>
-                  <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                    {Math.round(
-                      (request.donationReceived / request.donationGoal) * 100
-                    )}
-                    % funded
-                  </span>
-                </div>
+            {requests.map((request, index) => {
+              const requestStatus = calculateStatus(
+                request.donationReceived,
+                request.donationGoal
+              )
 
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
-                  <motion.div
-                    className="bg-blue-500 h-3 rounded-full"
-                    initial={{ width: "0%" }}
-                    animate={{
-                      width: `${Math.min(
-                        (request.donationReceived / request.donationGoal) * 100,
-                        100
-                      )}%`,
-                    }}
-                    transition={{ duration: 1, delay: 0.5 }}
-                  ></motion.div>
-                </div>
-                <div className="flex justify-between text-sm font-medium text-gray-700">
-                  <span>
-                    ₹{request.donationReceived.toLocaleString()} raised
-                  </span>
-                  <span>Goal: ₹{request.donationGoal.toLocaleString()}</span>
-                </div>
-              </motion.div>
-            ))}
+              return (
+                <motion.div
+                  key={request._id}
+                  onClick={() => router.push(`/requests/${request._id}`)}
+                  className={`p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-150 border border-blue-100 cursor-pointer
+                    ${requestStatus === "urgent" ? "bg-red-200" : ""} 
+                    ${requestStatus === "fulfilled" ? "bg-green-200" : ""} 
+                    ${requestStatus === "active" ? "bg-blue-200" : ""}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">
+                      {request.title}
+                    </h3>
+                    <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                      {Math.round(
+                        (request.donationReceived / request.donationGoal) * 100
+                      )}
+                      % funded
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                    <motion.div
+                      className="bg-blue-500 h-3 rounded-full"
+                      initial={{ width: "0%" }}
+                      animate={{
+                        width: `${Math.min(
+                          (request.donationReceived / request.donationGoal) *
+                            100,
+                          100
+                        )}%`,
+                      }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                    ></motion.div>
+                  </div>
+                  <div className="flex justify-between text-sm font-medium text-gray-700">
+                    <span>
+                      ₹{request.donationReceived.toLocaleString()} raised
+                    </span>
+                    <span>Goal: ₹{request.donationGoal.toLocaleString()}</span>
+                  </div>
+                </motion.div>
+              )
+            })}
             <motion.button
               onClick={() => router.push("/requests")}
               className="w-full text-blue-600 text-center py-2 hover:text-blue-800 text-sm font-medium"

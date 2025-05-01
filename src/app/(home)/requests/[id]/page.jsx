@@ -2,6 +2,11 @@
 import { useParams, useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import { loadStripe } from "@stripe/stripe-js"
+import { Elements} from "@stripe/react-stripe-js"
+import CheckoutForm from "../../../../components/CheckoutForm"
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 const Page = () => {
   const { id } = useParams()
@@ -11,6 +16,50 @@ const Page = () => {
   const [requestMakerID, setRequestMakerID] = useState(null)
   const [userName, setUserName] = useState("Anonymous")
   const [userImage, setUserImage] = useState("")
+  const [showDonationForm, setShowDonationForm] = useState(false)
+  const [donationAmount, setDonationAmount] = useState("")
+  const [donationStatus, setDonationStatus] = useState(null)
+  
+  // Share functionality
+  const handleShare = async (requestId) => {
+    try {
+      await navigator.share({
+        title: request.title,
+        text: request.description?.substring(0, 100) + "...",
+        url: window.location.href,
+      })
+    } catch (error) {
+      // Fallback to copy link if Web Share API isn't supported
+      navigator.clipboard.writeText(window.location.href)
+      alert("Link copied to clipboard!")
+    }
+  }
+
+  const handleDonateClick = () => {
+    setShowDonationForm(true)
+    // Set default donation amount to either the goal or 100
+    setDonationAmount(request.donationGoal ? Math.min(request.donationGoal, 100).toString() : "100")
+  }
+
+  const handleDonationSuccess = async (paymentIntent) => {
+    setDonationStatus({
+      success: true,
+      message: "Thank you for your donation!"
+    })
+    
+    // Refresh the request data to show updated donation amount
+    setTimeout(() => {
+      setShowDonationForm(false)
+      fetchRequestData()
+    }, 3000)
+  }
+
+  const handleDonationError = (errorMessage) => {
+    setDonationStatus({
+      success: false,
+      message: `Donation failed: ${errorMessage}`
+    })
+  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,22 +74,23 @@ const Page = () => {
     fetchUser()
   }, [])
 
-  useEffect(() => {
+  const fetchRequestData = async () => {
     if (!id) return
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch(`/api/Requests/${id}`, {
-          method: "GET",
-        })
-        const data = await response.json()
+    try {
+      const response = await fetch(`/api/Requests/${id}`, {
+        method: "GET",
+      })
+      const data = await response.json()
 
-        setRequest(data)
-        setRequestMakerID(data.user._id)
-      } catch (e) {
-        console.error("Error fetching request:", e)
-      }
+      setRequest(data)
+      setRequestMakerID(data.user._id)
+    } catch (e) {
+      console.error("Error fetching request:", e)
     }
-    fetchRequests()
+  }
+
+  useEffect(() => {
+    fetchRequestData()
   }, [id])
 
   const handleDelete = async () => {
@@ -77,7 +127,6 @@ const Page = () => {
     fetchUserName()
   }, [requestMakerID])
 
-  // Calculate donation progress percentage
   const progressPercentage = request.donationGoal
     ? Math.min(100, (request.donationReceived / request.donationGoal) * 100)
     : 0
@@ -136,7 +185,7 @@ const Page = () => {
           className="mt-4 flex items-center space-x-3"
         >
           <img
-            src={userImage || null}
+            src={userImage || "/placeholder-user.png"}
             alt="Organizer"
             className="w-10 h-10 rounded-full"
           />
@@ -172,7 +221,7 @@ const Page = () => {
           <div className="mb-4">
             <div className="flex justify-between mb-2">
               <span className="text-xl font-bold text-gray-800">
-                ₹{request.donationReceived?.toLocaleString() || "0"}
+               ₹{request.donationReceived?.toLocaleString() || "0"}
               </span>
               <span className="text-gray-600">
                 raised of ₹{request.donationGoal?.toLocaleString() || "0"} goal
@@ -192,87 +241,91 @@ const Page = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <motion.div
-            className="text-center flex flex-col items-center space-y-2"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <motion.button
-              onClick={() => handleShare(request._id)}
-              className="py-3 w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+          {/* Donation Form */}
+          {showDonationForm ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4"
             >
-              Share
-            </motion.button>
-
-            <motion.button
-              onClick={() => handleDonate(request._id)}
-              className="py-3 w-full bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              <h3 className="text-lg font-semibold mb-3">Enter Donation Amount</h3>
+              
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                  <input
+                    type="number"
+                    value={donationAmount}
+                    onChange={(e) => setDonationAmount(e.target.value)}
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Amount"
+                    min="1"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+              
+              {donationStatus && (
+                <div className={`mb-4 p-3 rounded-md ${donationStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {donationStatus.message}
+                </div>
+              )}
+              
+              <Elements stripe={stripePromise}>
+                <CheckoutForm 
+                  amount={donationAmount} 
+                  requestId={id}
+                  onSuccess={handleDonationSuccess} 
+                  onError={handleDonationError} 
+                />
+              </Elements>
+              
+              <button 
+                onClick={() => setShowDonationForm(false)}
+                className="mt-3 w-full py-2 text-gray-600 hover:text-gray-800 text-sm"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          ) : (
+            /* Action Buttons */
+            <motion.div
+              className="text-center flex flex-col items-center space-y-2"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 }}
             >
-              Donate
-            </motion.button>
-          </motion.div>
+              <motion.button
+                onClick={() => handleShare(request._id)}
+                className="py-3 w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Share
+              </motion.button>
 
-          {/* Status Information */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-6"
-          >
-            <div
-              className={`p-3 rounded-lg ${
-                request.status === "urgent"
-                  ? "bg-red-100 text-red-800"
-                  : request.status === "fulfilled"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-blue-100 text-blue-800"
-              }`}
-            >
-              {request.status === "urgent"
-                ? "This request is marked as urgent and needs immediate attention."
-                : request.status === "fulfilled"
-                ? "This request has been fulfilled. Thank you for your support!"
-                : "This request is active and seeking donations."}
-            </div>
-          </motion.div>
-
-          {/* Created Date */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="mt-6 text-center text-gray-600 text-sm"
-          >
-            Created{" "}
-            {request.createdAt
-              ? new Date(request.createdAt).toLocaleDateString()
-              : "recently"}
-          </motion.div>
+              <motion.button
+                onClick={handleDonateClick}
+                className="py-3 w-full bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Donate
+              </motion.button>
+              
+              {userID === requestMakerID && (
+                <motion.button
+                  onClick={handleDelete}
+                  className="py-3 w-full bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Delete Request
+                </motion.button>
+              )}
+            </motion.div>
+          )}
         </motion.div>
-        {/* Admin Action Buttons */}
-        {userID && userID === requestMakerID && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-6 flex space-x-4"
-          >
-            <motion.button
-              onClick={handleDelete}
-              className="py-3 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors max-3/4 mx-auto"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Delete Request
-            </motion.button>
-          </motion.div>
-        )}
       </div>
     </div>
   )

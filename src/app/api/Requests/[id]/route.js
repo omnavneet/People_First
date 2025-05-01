@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import Requests from "../../../../../models/Requests"
-import Users from "../../../../../models/Users"
 import connectionDB from "../../../../libs/connectionDB"
 import { z } from "zod"
 import mongoose from "mongoose"
