@@ -3,7 +3,7 @@ import { useParams, useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { loadStripe } from "@stripe/stripe-js"
-import { Elements} from "@stripe/react-stripe-js"
+import { Elements } from "@stripe/react-stripe-js"
 import CheckoutForm from "../../../../components/CheckoutForm"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -19,7 +19,7 @@ const Page = () => {
   const [showDonationForm, setShowDonationForm] = useState(false)
   const [donationAmount, setDonationAmount] = useState("")
   const [donationStatus, setDonationStatus] = useState(null)
-  
+
   // Share functionality
   const handleShare = async (requestId) => {
     try {
@@ -46,7 +46,7 @@ const Page = () => {
       success: true,
       message: "Thank you for your donation!"
     })
-    
+
     // Refresh the request data to show updated donation amount
     setTimeout(() => {
       setShowDonationForm(false)
@@ -145,13 +145,12 @@ const Page = () => {
             {request.title}
           </h1>
           <div
-            className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${
-              request.status === "urgent"
-                ? "bg-red-500"
-                : request.status === "fulfilled"
+            className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${request.status === "urgent"
+              ? "bg-red-500"
+              : request.status === "fulfilled"
                 ? "bg-green-500"
                 : "bg-blue-500"
-            }`}
+              }`}
           >
             {request.status?.toUpperCase()}
           </div>
@@ -221,7 +220,7 @@ const Page = () => {
           <div className="mb-4">
             <div className="flex justify-between mb-2">
               <span className="text-xl font-bold text-gray-800">
-               ₹{request.donationReceived?.toLocaleString() || "0"}
+                ₹{request.donationReceived?.toLocaleString() || "0"}
               </span>
               <span className="text-gray-600">
                 raised of ₹{request.donationGoal?.toLocaleString() || "0"} goal
@@ -249,7 +248,7 @@ const Page = () => {
               className="mb-4"
             >
               <h3 className="text-lg font-semibold mb-3">Enter Donation Amount</h3>
-              
+
               <div className="mb-4">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
@@ -264,23 +263,23 @@ const Page = () => {
                   />
                 </div>
               </div>
-              
+
               {donationStatus && (
                 <div className={`mb-4 p-3 rounded-md ${donationStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                   {donationStatus.message}
                 </div>
               )}
-              
+
               <Elements stripe={stripePromise}>
-                <CheckoutForm 
-                  amount={donationAmount} 
+                <CheckoutForm
+                  amount={donationAmount}
                   requestId={id}
-                  onSuccess={handleDonationSuccess} 
-                  onError={handleDonationError} 
+                  onSuccess={handleDonationSuccess}
+                  onError={handleDonationError}
                 />
               </Elements>
-              
-              <button 
+
+              <button
                 onClick={() => setShowDonationForm(false)}
                 className="mt-3 w-full py-2 text-gray-600 hover:text-gray-800 text-sm"
               >
@@ -312,7 +311,7 @@ const Page = () => {
               >
                 Donate
               </motion.button>
-              
+
               {userID === requestMakerID && (
                 <motion.button
                   onClick={handleDelete}
@@ -323,8 +322,28 @@ const Page = () => {
                   Delete Request
                 </motion.button>
               )}
+
             </motion.div>
           )}
+        </motion.div>
+
+        <motion.div
+          className="mt-6 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <h2>AI analysis</h2>
+
+          {request?.trustAnalysis && (
+            <p>{request.trustAnalysis.judgment}</p>
+          )}
+
+          {request?.trustAnalysis && (
+            <p>{request.trustAnalysis.reason}</p>
+          )}
+
+
         </motion.div>
       </div>
     </div>

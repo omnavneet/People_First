@@ -1,5 +1,5 @@
 import React from "react"
-import DashboardNavbar from "@/components/DashboardNavbar"
+import DashboardNavbar from "../../components/DashboardNavbar"
 
 const Dashboard = ({ children }) => {
   return (

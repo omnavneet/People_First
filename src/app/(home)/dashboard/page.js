@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import DashboardRequest from "@/components/DashboardRequest"
-import DashboardEvents from "@/components/DashboardEvents"
+import DashboardRequest from "../../../components/DashboardRequest"
+import DashboardEvents from "../../../components/DashboardEvents"
                   
 const Home = () => {
   const [user, setUser] = useState(null)

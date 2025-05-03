@@ -1,6 +1,6 @@
-import connectionDB from "@/libs/connectionDB"
+import connectionDB from "../../../../libs/connectionDB"
 import { jwtVerify } from "jose"
-import User from "models/Users"
+import User from "../../../../../models/Users"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 

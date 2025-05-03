@@ -14,6 +14,15 @@ const RequestSchema = new mongoose.Schema(
     },
     donationReceived: { type: Number, default: 0 },
     image: { type: String, default: "" },
+
+    trustAnalysis: {
+      summary: { type: String },
+      judgment: {
+        type: String,
+        enum: ["Trustworthy", "Needs Review", "Suspicious"],
+      },
+      reason: { type: String },
+    },
   },
   { timestamps: true }
 )
