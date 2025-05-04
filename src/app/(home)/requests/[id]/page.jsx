@@ -38,13 +38,17 @@ const Page = () => {
   const handleDonateClick = () => {
     setShowDonationForm(true)
     // Set default donation amount to either the goal or 100
-    setDonationAmount(request.donationGoal ? Math.min(request.donationGoal, 100).toString() : "100")
+    setDonationAmount(
+      request.donationGoal
+        ? Math.min(request.donationGoal, 100).toString()
+        : "100"
+    )
   }
 
   const handleDonationSuccess = async (paymentIntent) => {
     setDonationStatus({
       success: true,
-      message: "Thank you for your donation!"
+      message: "Thank you for your donation!",
     })
 
     // Refresh the request data to show updated donation amount
@@ -57,7 +61,7 @@ const Page = () => {
   const handleDonationError = (errorMessage) => {
     setDonationStatus({
       success: false,
-      message: `Donation failed: ${errorMessage}`
+      message: `Donation failed: ${errorMessage}`,
     })
   }
 
@@ -132,7 +136,7 @@ const Page = () => {
     : 0
 
   return (
-    <div className="grid md:grid-cols-3 gap-6 p-6">
+    <div className="grid md:grid-cols-3 gap-4 p-6">
       {/* Left Column - Image and Details */}
       <div className="md:col-span-2">
         <motion.div
@@ -145,12 +149,13 @@ const Page = () => {
             {request.title}
           </h1>
           <div
-            className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${request.status === "urgent"
-              ? "bg-red-500"
-              : request.status === "fulfilled"
+            className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${
+              request.status === "urgent"
+                ? "bg-red-500"
+                : request.status === "fulfilled"
                 ? "bg-green-500"
                 : "bg-blue-500"
-              }`}
+            }`}
           >
             {request.status?.toUpperCase()}
           </div>
@@ -247,11 +252,15 @@ const Page = () => {
               animate={{ opacity: 1, y: 0 }}
               className="mb-4"
             >
-              <h3 className="text-lg font-semibold mb-3">Enter Donation Amount</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                Enter Donation Amount
+              </h3>
 
               <div className="mb-4">
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    ₹
+                  </span>
                   <input
                     type="number"
                     value={donationAmount}
@@ -265,7 +274,13 @@ const Page = () => {
               </div>
 
               {donationStatus && (
-                <div className={`mb-4 p-3 rounded-md ${donationStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                <div
+                  className={`mb-4 p-3 rounded-md ${
+                    donationStatus.success
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
                   {donationStatus.message}
                 </div>
               )}
@@ -322,28 +337,61 @@ const Page = () => {
                   Delete Request
                 </motion.button>
               )}
-
             </motion.div>
           )}
         </motion.div>
 
+        {/* Replace the existing AI analysis section */}
         <motion.div
-          className="mt-6 text-center"
+          className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
-          <h2>AI analysis</h2>
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="white"
+                className="w-5 h-5"
+              >
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              AI Analysis
+            </h2>
+          </div>
 
-          {request?.trustAnalysis && (
-            <p>{request.trustAnalysis.judgment}</p>
+          {request?.trustAnalysis ? (
+            <>
+              <div className="flex items-center mb-3">
+                <div
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                    request.trustAnalysis.judgment === "Trustworthy"
+                      ? "bg-green-500"
+                      : request.trustAnalysis.judgment === "Needs Review"
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }`}
+                >
+                  {request.trustAnalysis.judgment}
+                </div>
+              </div>
+
+              <div className="relative pl-4 border-l-2 border-purple-200">
+                <p className="text-gray-800 italic text-[17px]">
+                  {request.trustAnalysis.reason}
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="w-10 h-10 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-3"></div>
+              <p className="text-gray-600">Analyzing this request...</p>
+            </div>
           )}
-
-          {request?.trustAnalysis && (
-            <p>{request.trustAnalysis.reason}</p>
-          )}
-
-
         </motion.div>
       </div>
     </div>

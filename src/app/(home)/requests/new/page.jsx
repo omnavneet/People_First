@@ -18,7 +18,7 @@ const Page = () => {
   const InputSchema = z.object({
     title: z.string().min(5).max(100),
     description: z.string().min(20),
-    donationGoal: z.number().positive(), // Change string to number
+    donationGoal: z.number().positive(),
     image: z.any(),
   })
 
@@ -68,7 +68,6 @@ const Page = () => {
     }
 
     try {
-      // Validate form data (except the file)
       InputSchema.parse({
         ...newRequest,
         donationGoal: parseFloat(newRequest.donationGoal),
@@ -83,11 +82,9 @@ const Page = () => {
     }
 
     try {
-      // Upload the image to S3 using the server-side endpoint
       let imageUrl = ""
 
       if (newRequest.image instanceof File) {
-        // Step 1: Get the signed URL from the backend
         const presignedUrlRes = await fetch("/api/upload_image", {
           method: "POST",
           headers: {
@@ -107,16 +104,8 @@ const Page = () => {
         const { imageUrl: publicUrl } = await presignedUrlRes.json()
 
         console.log("Image uploaded successfully")
-        imageUrl = publicUrl // Use the public URL for viewing
+        imageUrl = publicUrl
       }
-
-      // Send final data to /api/Requests
-      console.log("Creating request with data:", {
-        ...newRequest,
-        image: imageUrl,
-        donationGoal: parseFloat(newRequest.donationGoal),
-        user: userId,
-      })
 
       const response = await fetch("/api/Requests", {
         method: "POST",
