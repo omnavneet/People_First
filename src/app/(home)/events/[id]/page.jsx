@@ -22,7 +22,6 @@ const EventDetailPage = () => {
         url: window.location.href,
       })
     } catch (error) {
-      // Fallback to copy link if Web Share API isn't supported
       navigator.clipboard.writeText(window.location.href)
       alert("Link copied to clipboard!")
     }
@@ -35,8 +34,8 @@ const EventDetailPage = () => {
     }
 
     try {
-      const response = await fetch(`/api/Events/${id}/like`, {
-        method: "POST",
+      const response = await fetch(`/api/Events/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -78,7 +77,7 @@ const EventDetailPage = () => {
       const data = await response.json()
 
       setEvent(data)
-      setEventOrganizerID(data.user._id)
+      setEventOrganizerID(data?.user?._id)
 
       // Check if the current user has liked this event
       if (userID && data.likedBy?.includes(userID)) {
@@ -164,22 +163,25 @@ const EventDetailPage = () => {
         </motion.div>
 
         {event.image ? (
-          <motion.img
-            src={event.image}
-            alt={event.title}
+          <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="w-full h-full object-cover rounded-lg"
-          />
+            className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"
+          >
+            <img
+              src={event.image}
+              alt={event.title}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="w-full h-80 flex items-center justify-center text-gray-400 bg-gray-100 rounded-lg"
+            className="w-full aspect-video flex items-center justify-center text-gray-400 bg-gray-100 rounded-lg"
           >
-            No Image Available
           </motion.div>
         )}
 

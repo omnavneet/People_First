@@ -149,37 +149,40 @@ const Page = () => {
             {request.title}
           </h1>
           <div
-            className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${
-              request.status === "urgent"
+            className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${request.status === "urgent"
                 ? "bg-red-500"
                 : request.status === "fulfilled"
-                ? "bg-green-500"
-                : "bg-blue-500"
-            }`}
+                  ? "bg-green-500"
+                  : "bg-blue-500"
+              }`}
           >
             {request.status?.toUpperCase()}
           </div>
         </motion.div>
 
         {request.image ? (
-          <motion.img
-            src={request.image}
-            alt={request.title}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="w-full h-full object-cover rounded-lg"
-          />
+            className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"
+          >
+            <img
+              src={request.image}
+              alt={request.title}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="w-full h-80 flex items-center justify-center text-gray-400 bg-gray-100 rounded-lg"
+            className="w-full aspect-video flex items-center justify-center text-gray-400 bg-gray-100 rounded-lg"
           >
-            No Image Available
           </motion.div>
         )}
+
 
         {/* Organizer Info */}
         <motion.div
@@ -275,11 +278,10 @@ const Page = () => {
 
               {donationStatus && (
                 <div
-                  className={`mb-4 p-3 rounded-md ${
-                    donationStatus.success
+                  className={`mb-4 p-3 rounded-md ${donationStatus.success
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
-                  }`}
+                    }`}
                 >
                   {donationStatus.message}
                 </div>
@@ -368,13 +370,12 @@ const Page = () => {
             <>
               <div className="flex items-center mb-3">
                 <div
-                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                    request.trustAnalysis.judgment === "Trustworthy"
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${request.trustAnalysis.judgment === "Trustworthy"
                       ? "bg-green-500"
                       : request.trustAnalysis.judgment === "Needs Review"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }`}
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    }`}
                 >
                   {request.trustAnalysis.judgment}
                 </div>

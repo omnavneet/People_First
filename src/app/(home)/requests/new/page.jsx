@@ -11,6 +11,7 @@ const Page = () => {
     image: "",
     status: "active",
   })
+  const [imagePreview, setImagePreview] = useState(null)
   const [userId, setUserId] = useState(null)
   const [error, setError] = useState(null)
   const router = useRouter()
@@ -19,7 +20,7 @@ const Page = () => {
     title: z.string().min(5).max(100),
     description: z.string().min(20),
     donationGoal: z.number().positive(),
-    image: z.any(),
+    image: z.string(),
   })
 
   useEffect(() => {
@@ -46,18 +47,41 @@ const Page = () => {
   }, [])
 
   const handleInputChange = (e) => {
-    const { name, value, type, files } = e.target
+    const { name, value } = e.target
+    setNewRequest((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
 
-    if (type === "file" && files[0]) {
-      setNewRequest((prev) => ({
-        ...prev,
-        [name]: files[0],
-      }))
-    } else {
-      setNewRequest((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type and size
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif']
+      const maxSize = 5 * 1024 * 1024 // 5MB
+
+      if (!validTypes.includes(file.type)) {
+        setError("Invalid file type. Please upload JPEG, PNG, or GIF.")
+        return
+      }
+
+      if (file.size > maxSize) {
+        setError("File is too large. Maximum size is 5MB.")
+        return
+      }
+
+      // Create file reader to generate base64 preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result)
+        setNewRequest((prev) => ({
+          ...prev,
+          image: reader.result
+        }))
+        setError(null)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -82,31 +106,6 @@ const Page = () => {
     }
 
     try {
-      let imageUrl = ""
-
-      if (newRequest.image instanceof File) {
-        const presignedUrlRes = await fetch("/api/upload_image", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fileName: newRequest.image.name,
-            fileType: newRequest.image.type,
-          }),
-        })
-
-        if (!presignedUrlRes.ok) {
-          const errorText = await presignedUrlRes.text()
-          throw new Error(`Failed to get signed URL: ${errorText}`)
-        }
-
-        const { imageUrl: publicUrl } = await presignedUrlRes.json()
-
-        console.log("Image uploaded successfully")
-        imageUrl = publicUrl
-      }
-
       const response = await fetch("/api/Requests", {
         method: "POST",
         headers: {
@@ -114,7 +113,6 @@ const Page = () => {
         },
         body: JSON.stringify({
           ...newRequest,
-          image: imageUrl, // Include the public URL for viewing
           donationGoal: parseFloat(newRequest.donationGoal),
           user: userId,
         }),
@@ -214,24 +212,33 @@ const Page = () => {
               </div>
             </div>
 
-            {/* Image */}
+            {/* Image Upload */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
-                Image URL (Optional)
+                Request Image
               </label>
               <input
                 type="file"
-                name="image"
-                accept="image/*"
-                onChange={(e) =>
-                  setNewRequest((prev) => ({
-                    ...prev,
-                    image: e.target.files[0], // store the File object
-                  }))
-                }
-                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
+                accept="image/jpeg,image/png,image/gif"
+                onChange={handleImageUpload}
+                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:px-4 file:py-2 file:text-white hover:file:bg-blue-600"
               />
+              {error && typeof error === 'string' && (
+                <p className="text-red-500 text-sm mt-1">{error}</p>
+              )}
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="mt-4">
+                  <img
+                    src={imagePreview}
+                    alt="Request Preview"
+                    className="w-full h-48 object-cover rounded-xl shadow-md"
+                  />
+                </div>
+              )}
             </div>
+            
             {/* Status */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">

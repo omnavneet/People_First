@@ -10,6 +10,7 @@ const NewEventPage = () => {
     image: "",
     status: "upcoming",
   })
+  const [imagePreview, setImagePreview] = useState(null)
   const [userId, setUserId] = useState(null)
   const [error, setError] = useState(null)
   const router = useRouter()
@@ -17,7 +18,7 @@ const NewEventPage = () => {
   const InputSchema = z.object({
     title: z.string().min(5).max(100),
     description: z.string().min(20),
-    image: z.string().optional(),
+    image: z.string(),
     status: z.enum(["upcoming", "completed", "cancelled"]),
   })
 
@@ -29,8 +30,8 @@ const NewEventPage = () => {
           credentials: "include",
         })
         const data = await response.json()
-        if (data._id) {
-          setUserId(data._id)
+        if (data?._id) {
+          setUserId(data?._id)
         } else {
           console.error("User not authenticated")
           setError("User not found or not authenticated")
@@ -50,6 +51,37 @@ const NewEventPage = () => {
       ...prev,
       [name]: value,
     }))
+  }
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type and size
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif']
+      const maxSize = 5 * 1024 * 1024 // 5MB
+
+      if (!validTypes.includes(file.type)) {
+        setError("Invalid file type. Please upload JPEG, PNG, or GIF.")
+        return
+      }
+
+      if (file.size > maxSize) {
+        setError("File is too large. Maximum size is 5MB.")
+        return
+      }
+
+      // Create file reader to generate base64 preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result)
+        setNewEvent((prev) => ({
+          ...prev,
+          image: reader.result
+        }))
+        setError(null)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const handleNewEvent = async () => {
@@ -88,7 +120,7 @@ const NewEventPage = () => {
 
       const data = await response.json()
       console.log("Event created successfully:", data)
-      router.push(`/events/${data.event?._id}`)
+      router.push(`/events/${data?.event?._id}`)
     } catch (error) {
       console.error("Error creating event:", error)
       setError(error.message)
@@ -148,19 +180,31 @@ const NewEventPage = () => {
           </div>
 
           <div className="space-y-6">
-            {/* Image URL */}
+            {/* Image Upload */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
-                Image URL (Optional)
+                Event Image
               </label>
               <input
-                type="text"
-                name="image"
-                value={newEvent.image}
-                onChange={handleInputChange}
-                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all placeholder-gray-400"
-                placeholder="https://example.com/image.jpg"
+                type="file"
+                accept="image/jpeg,image/png,image/gif"
+                onChange={handleImageUpload}
+                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm file:mr-4 file:rounded-md file:border-0 file:bg-pink-500 file:px-4 file:py-2 file:text-white hover:file:bg-pink-600"
               />
+              {error && typeof error === 'string' && (
+                <p className="text-red-500 text-sm mt-1">{error}</p>
+              )}
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="mt-4">
+                  <img
+                    src={imagePreview}
+                    alt="Event Preview"
+                    className="w-full h-48 object-cover rounded-xl shadow-md"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Status */}
@@ -180,7 +224,6 @@ const NewEventPage = () => {
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"></div>
                 {error && error.some?.((e) => e.path[0] === "status") && (
                   <p className="text-red-500 text-sm mt-1">
                     {error.find((e) => e.path[0] === "status")?.message}
