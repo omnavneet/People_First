@@ -62,26 +62,18 @@ const EventDetailPage = () => {
     fetchUser()
   }, [])
 
-  // Format the event date whenever the event data changes
   useEffect(() => {
     if (event?.eventDate) {
       try {
-        // Handle the eventDate as a timestamp (number)
         const date = new Date(Number(event.eventDate));
-        
-        // Check if date is valid
-        if (!isNaN(date.getTime())) {
-          setFormattedEventDate(date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          }));
-        } else {
-          setFormattedEventDate("Date not available");
-        }
+        setFormattedEventDate(date.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }));
       } catch (error) {
-        console.error("Error formatting date:", error);
+        console.log("Error formatting date:", error);
         setFormattedEventDate("Date format error");
       }
     } else {
@@ -358,7 +350,7 @@ const EventDetailPage = () => {
 
         {/* Event Date */}
         <motion.div
-          className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 shadow-sm"
+          className="mt-3 px-3 py-3 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
@@ -391,40 +383,58 @@ const EventDetailPage = () => {
             </p>
           </div>
         </motion.div>
-        
-        {/* Event Status Section */}
+
+
+        {/*AI analysis*/}
         <motion.div
-          className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 shadow-sm"
+          className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
           <div className="flex items-center mb-4">
-            <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="white"
                 className="w-5 h-5"
               >
-                <path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Event Status
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              AI Analysis
             </h2>
           </div>
 
-          <div className="relative pl-4 border-l-2 border-purple-200">
-            <p className="text-gray-800 text-[17px]">
-              {event.status === "upcoming" &&
-                "This event is coming soon! Don't miss out."}
-              {event.status === "completed" &&
-                "This event has already taken place."}
-              {event.status === "cancelled" &&
-                "Unfortunately, this event has been cancelled."}
-            </p>
-          </div>
+          {event?.eventAnalysis ? (
+            <>
+              <div className="flex items-center mb-3">
+                <div
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${event.eventAnalysis.judgment === "Trustworthy"
+                    ? "bg-green-500"
+                    : event.eventAnalysis.judgment === "Needs Review"
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                    }`}
+                >
+                  {event.eventAnalysis.judgment}
+                </div>
+              </div>
+
+              <div className="relative pl-4 border-l-2 border-purple-200">
+                <p className="text-gray-800 italic text-[17px]">
+                  {event.eventAnalysis.reason}
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="w-10 h-10 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-3"></div>
+              <p className="text-gray-600">Analyzing this request...</p>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

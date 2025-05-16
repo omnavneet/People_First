@@ -22,8 +22,6 @@ export async function POST(req) {
       trustAnalysis,
     })
 
-    console.log(trustAnalysis)
-
     return NextResponse.json({ success: true, request })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

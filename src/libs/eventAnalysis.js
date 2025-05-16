@@ -6,7 +6,6 @@ import { StructuredOutputParser } from "@langchain/core/output_parsers"
 
 const trustAnalysisParser = StructuredOutputParser.fromZodSchema(
   z.object({
-    summary: z.string().describe("A short summary of the analysis"),
     judgment: z
       .enum(["Trustworthy", "Needs Review", "Suspicious"])
       .describe("Final judgment on the request"),
@@ -14,20 +13,19 @@ const trustAnalysisParser = StructuredOutputParser.fromZodSchema(
   })
 )
 
-const templateString = `You are an assistant that evaluates trustworthiness of fundraising requests.
+const templateString = `You are an assistant that evaluates trustworthiness of fundraising events.
 Given the following information:
 Title: {title}
 Description: {description}
-Donation Goal: ₹{donationGoal}
 
-1. Analyze if the request seems genuine or suspicious.
+1. Analyze if the event seems genuine or suspicious.
 2. Briefly explain your reasoning.
 3. Give a final judgment: "Trustworthy", "Needs Review", or "Suspicious".
 
 {format_instructions}
 `
 
-export async function analyzeRequestTrust(data) {
+export async function analyzeEventTrust(data) {
   try {
     const model = new ChatGoogleGenerativeAI({
       apiKey: process.env.NEXT_GOOGLE_GEMINI_API_KEY,
@@ -43,7 +41,6 @@ export async function analyzeRequestTrust(data) {
       {
         title: (input) => input.title,
         description: (input) => input.description,
-        donationGoal: (input) => input.donationGoal,
         format_instructions: () => formatInstructions,
       },
       prompt,
@@ -54,7 +51,6 @@ export async function analyzeRequestTrust(data) {
         } catch (error) {
           console.error("Error parsing output:", error)
           return {
-            summary: "Error analyzing request",
             judgment: "Needs Review",
             reason: "Could not parse analysis results.",
           }
@@ -67,7 +63,6 @@ export async function analyzeRequestTrust(data) {
   } catch (error) {
     console.error("Trust analysis error:", error)
     return {
-      summary: "Error analyzing request",
       judgment: "Needs Review",
       reason: "An error occurred during analysis.",
     }

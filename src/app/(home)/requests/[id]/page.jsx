@@ -29,7 +29,6 @@ const Page = () => {
         url: window.location.href,
       })
     } catch (error) {
-      // Fallback to copy link if Web Share API isn't supported
       navigator.clipboard.writeText(window.location.href)
       alert("Link copied to clipboard!")
     }
@@ -37,7 +36,6 @@ const Page = () => {
 
   const handleDonateClick = () => {
     setShowDonationForm(true)
-    // Set default donation amount to either the goal or 100
     setDonationAmount(
       request.donationGoal
         ? Math.min(request.donationGoal, 100).toString()
@@ -51,7 +49,6 @@ const Page = () => {
       message: "Thank you for your donation!",
     })
 
-    // Refresh the request data to show updated donation amount
     setTimeout(() => {
       setShowDonationForm(false)
       fetchRequestData()
@@ -343,7 +340,7 @@ const Page = () => {
           )}
         </motion.div>
 
-        {/* Replace the existing AI analysis section */}
+        {/* AI analysis */}
         <motion.div
           className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 shadow-sm"
           initial={{ opacity: 0, y: 20 }}

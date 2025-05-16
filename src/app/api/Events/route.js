@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import Events from "../../../../models/Events"
 import connectionDB from "../../../libs/connectionDB"
+import { analyzeEventTrust } from "../../../libs/eventAnalysis"
 
 //Get All Events
 export async function GET() {
@@ -15,7 +16,11 @@ export async function POST(req) {
   const data = await req.json()
 
   try {
-    const event = await Events.create(data)
+    const eventAnalysis = await analyzeEventTrust(data)
+    const event = await Events.create({
+      ...data,
+      eventAnalysis,
+    })
     return NextResponse.json(event)
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
