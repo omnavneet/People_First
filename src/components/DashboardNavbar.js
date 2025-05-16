@@ -20,7 +20,7 @@ const Sidebar = () => {
   const pathname = usePathname()
 
   return (
-    <div className="h-screen w-64 fixed left-0 top-0 bg-green-100 shadow-md flex flex-col">
+    <div className="h-screen w-64 mr-2 fixed left-0 top-0 bg-green-100 shadow-md flex flex-col">
       {/* Logo section */}
       <div className="p-6 border-b">
         <Link href="/" className="flex items-center space-x-2 group">

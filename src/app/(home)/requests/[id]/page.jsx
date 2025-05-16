@@ -150,10 +150,10 @@ const Page = () => {
           </h1>
           <div
             className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${request.status === "urgent"
-                ? "bg-red-500"
-                : request.status === "fulfilled"
-                  ? "bg-green-500"
-                  : "bg-blue-500"
+              ? "bg-red-500"
+              : request.status === "fulfilled"
+                ? "bg-green-500"
+                : "bg-blue-500"
               }`}
           >
             {request.status?.toUpperCase()}
@@ -279,8 +279,8 @@ const Page = () => {
               {donationStatus && (
                 <div
                   className={`mb-4 p-3 rounded-md ${donationStatus.success
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
                     }`}
                 >
                   {donationStatus.message}
@@ -371,10 +371,10 @@ const Page = () => {
               <div className="flex items-center mb-3">
                 <div
                   className={`px-3 py-1 rounded-full text-white text-sm font-medium ${request.trustAnalysis.judgment === "Trustworthy"
-                      ? "bg-green-500"
-                      : request.trustAnalysis.judgment === "Needs Review"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
+                    ? "bg-green-500"
+                    : request.trustAnalysis.judgment === "Needs Review"
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
                     }`}
                 >
                   {request.trustAnalysis.judgment}

@@ -13,6 +13,7 @@ const EventSchema = new mongoose.Schema(
       enum: ["upcoming", "completed", "cancelled"],
       default: "upcoming",
     },
+    eventDate: {type: Number, required: true},
   },
   {
     timestamps: true,

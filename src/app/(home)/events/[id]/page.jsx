@@ -12,8 +12,8 @@ const EventDetailPage = () => {
   const [userName, setUserName] = useState("Anonymous")
   const [userImage, setUserImage] = useState("")
   const [isLiked, setIsLiked] = useState(false)
+  const [formattedEventDate, setFormattedEventDate] = useState("")
 
-  // Share functionality
   const handleShare = async () => {
     try {
       await navigator.share({
@@ -23,32 +23,26 @@ const EventDetailPage = () => {
       })
     } catch (error) {
       navigator.clipboard.writeText(window.location.href)
-      alert("Link copied to clipboard!")
     }
   }
 
   const handleLikeToggle = async () => {
-    if (!userID) {
-      alert("You need to be logged in to like events!")
-      return
-    }
+    console.log("Like button clicked")
+    if (!userID) return
 
     try {
       const response = await fetch(`/api/Events/${id}`, {
-        method: "PUT",
+        method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ userId: userID }),
       })
 
       if (response.ok) {
-        setIsLiked(!isLiked)
-        // Update the likes count immediately in the UI
-        setEvent((prev) => ({
-          ...prev,
-          likes: isLiked ? prev.likes - 1 : prev.likes + 1,
-        }))
+        const updatedEvent = await response.json()
+        setIsLiked(updatedEvent.likedBy.some(user => user._id === userID || user === userID))
+        setEvent(updatedEvent)
       }
     } catch (error) {
       console.error("Error toggling like:", error)
@@ -68,6 +62,33 @@ const EventDetailPage = () => {
     fetchUser()
   }, [])
 
+  // Format the event date whenever the event data changes
+  useEffect(() => {
+    if (event?.eventDate) {
+      try {
+        // Handle the eventDate as a timestamp (number)
+        const date = new Date(Number(event.eventDate));
+        
+        // Check if date is valid
+        if (!isNaN(date.getTime())) {
+          setFormattedEventDate(date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }));
+        } else {
+          setFormattedEventDate("Date not available");
+        }
+      } catch (error) {
+        console.error("Error formatting date:", error);
+        setFormattedEventDate("Date format error");
+      }
+    } else {
+      setFormattedEventDate("Date not available");
+    }
+  }, [event]);
+
   const fetchEventData = async () => {
     if (!id) return
     try {
@@ -76,12 +97,16 @@ const EventDetailPage = () => {
       })
       const data = await response.json()
 
+      console.log(data)
+
       setEvent(data)
       setEventOrganizerID(data?.user?._id)
 
-      // Check if the current user has liked this event
-      if (userID && data.likedBy?.includes(userID)) {
-        setIsLiked(true)
+      if (userID && data.likedBy) {
+        const hasLiked = data.likedBy.some(
+          user => (typeof user === 'object' ? user._id === userID : user === userID)
+        )
+        setIsLiked(hasLiked)
       }
     } catch (e) {
       console.error("Error fetching event:", e)
@@ -89,8 +114,16 @@ const EventDetailPage = () => {
   }
 
   useEffect(() => {
-    fetchEventData()
+    if (userID) {
+      fetchEventData()
+    }
   }, [id, userID])
+
+  useEffect(() => {
+    if (!userID) {
+      fetchEventData()
+    }
+  }, [id])
 
   const handleDelete = async () => {
     if (eventOrganizerID !== userID) {
@@ -126,7 +159,7 @@ const EventDetailPage = () => {
     fetchUserName()
   }, [eventOrganizerID])
 
-  // Get status color
+  // status color
   const getStatusColor = (status) => {
     switch (status) {
       case "upcoming":
@@ -141,7 +174,7 @@ const EventDetailPage = () => {
   }
 
   return (
-    <div className="grid md:grid-cols-3 gap-4 p-6">
+    <div className="grid md:grid-cols-3 gap-4 py-6">
       {/* Left Column - Image and Details */}
       <div className="md:col-span-2">
         <motion.div
@@ -163,7 +196,7 @@ const EventDetailPage = () => {
         </motion.div>
 
         {event.image ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -244,7 +277,7 @@ const EventDetailPage = () => {
                   />
                 </svg>
                 <span className="text-gray-700">
-                  {new Date(event.createdAt).toLocaleDateString("en-US", {
+                  Created: {new Date(event.createdAt).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -288,13 +321,13 @@ const EventDetailPage = () => {
 
             <motion.button
               onClick={handleLikeToggle}
-              className={`py-3 w-full text-white rounded-lg transition-all ${
-                isLiked
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-indigo-600 hover:bg-indigo-700"
-              }`}
+              className={`py-3 w-full text-white rounded-lg transition-all ${isLiked
+                ? "bg-red-500 hover:bg-red-600"
+                : "bg-indigo-600 hover:bg-indigo-700"
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              disabled={!userID}
             >
               {isLiked ? "Unlike" : "Like"}
             </motion.button>
@@ -323,7 +356,43 @@ const EventDetailPage = () => {
           </motion.div>
         </motion.div>
 
-        {/* Event Stats Section */}
+        {/* Event Date */}
+        <motion.div
+          className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 shadow-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Event Date
+            </h2>
+          </div>
+
+          <div className="relative pl-4 border-l-2 border-purple-200">
+            <p className="text-gray-800 text-[17px]">
+              {formattedEventDate}
+            </p>
+          </div>
+        </motion.div>
+        
+        {/* Event Status Section */}
         <motion.div
           className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
@@ -354,16 +423,6 @@ const EventDetailPage = () => {
                 "This event has already taken place."}
               {event.status === "cancelled" &&
                 "Unfortunately, this event has been cancelled."}
-            </p>
-
-            <p className="text-gray-600 mt-2 text-sm">
-              Created{" "}
-              {event.createdAt &&
-                new Date(event.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
             </p>
           </div>
         </motion.div>

@@ -45,7 +45,7 @@ const EventsPage = () => {
   }
 
   return (
-    <div className="px-2 py-8 max-w-6xl mx-auto bg-pink-50 min-h-screen">
+    <div className="py-8 w-auto bg-pink-50 min-h-screen">
       <motion.header
         className="text-center mb-8"
         initial={{ opacity: 0, y: -20 }}

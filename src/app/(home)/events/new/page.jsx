@@ -9,6 +9,7 @@ const NewEventPage = () => {
     description: "",
     image: "",
     status: "upcoming",
+    eventDate: "",
   })
   const [imagePreview, setImagePreview] = useState(null)
   const [userId, setUserId] = useState(null)
@@ -16,10 +17,11 @@ const NewEventPage = () => {
   const router = useRouter()
 
   const InputSchema = z.object({
-    title: z.string().min(5).max(100),
-    description: z.string().min(20),
-    image: z.string(),
+    title: z.string().min(5, "Title must be at least 5 characters").max(100),
+    description: z.string().min(20, "Description must be at least 20 characters"),
+    image: z.string().nonempty("Image is required"),
     status: z.enum(["upcoming", "completed", "cancelled"]),
+    eventDate: z.string().nonempty("Date is required"),
   })
 
   useEffect(() => {
@@ -31,14 +33,13 @@ const NewEventPage = () => {
         })
         const data = await response.json()
         if (data?._id) {
-          setUserId(data?._id)
+          setUserId(data._id)
         } else {
-          console.error("User not authenticated")
-          setError("User not found or not authenticated")
+          setError("User not authenticated")
         }
       } catch (error) {
         console.error("Error fetching user:", error)
-        setError("Error fetching user data")
+        setError("Error fetching user")
       }
     }
 
@@ -56,9 +57,8 @@ const NewEventPage = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0]
     if (file) {
-      // Validate file type and size
       const validTypes = ['image/jpeg', 'image/png', 'image/gif']
-      const maxSize = 5 * 1024 * 1024 // 5MB
+      const maxSize = 5 * 1024 * 1024
 
       if (!validTypes.includes(file.type)) {
         setError("Invalid file type. Please upload JPEG, PNG, or GIF.")
@@ -70,7 +70,6 @@ const NewEventPage = () => {
         return
       }
 
-      // Create file reader to generate base64 preview
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result)
@@ -85,10 +84,7 @@ const NewEventPage = () => {
   }
 
   const handleNewEvent = async () => {
-    if (!userId) {
-      setError("You need to be logged in to create an event")
-      return
-    }
+    if (!userId) return
 
     try {
       InputSchema.parse(newEvent)
@@ -96,7 +92,6 @@ const NewEventPage = () => {
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError(error.errors)
-        console.error("Validation error:", error.errors)
         return
       }
     }
@@ -104,26 +99,23 @@ const NewEventPage = () => {
     try {
       const response = await fetch("/api/Events", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...newEvent,
           user: userId,
+          eventDate: new Date(newEvent.eventDate).getTime(),
         }),
       })
 
       if (!response.ok) {
         const errorText = await response.text()
-        throw new Error(`Event creation failed: ${errorText}`)
+        throw new Error(errorText)
       }
 
       const data = await response.json()
-      console.log("Event created successfully:", data)
       router.push(`/events/${data?.event?._id}`)
     } catch (error) {
-      console.error("Error creating event:", error)
-      setError(error.message)
+      setError(error.message || "Event creation failed")
     }
   }
 
@@ -146,15 +138,9 @@ const NewEventPage = () => {
                 name="title"
                 value={newEvent.title}
                 onChange={handleInputChange}
-                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all placeholder-gray-400"
+                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm"
                 placeholder="Enter event title"
-                required
               />
-              {error && error.some?.((e) => e.path[0] === "title") && (
-                <p className="text-red-500 text-sm mt-1">
-                  {error.find((e) => e.path[0] === "title")?.message}
-                </p>
-              )}
             </div>
 
             {/* Description */}
@@ -167,15 +153,9 @@ const NewEventPage = () => {
                 value={newEvent.description}
                 onChange={handleInputChange}
                 rows="7"
-                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all placeholder-gray-400"
-                placeholder="Describe your event in detail..."
-                required
+                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm"
+                placeholder="Describe your event..."
               />
-              {error && error.some?.((e) => e.path[0] === "description") && (
-                <p className="text-red-500 text-sm mt-1">
-                  {error.find((e) => e.path[0] === "description")?.message}
-                </p>
-              )}
             </div>
           </div>
 
@@ -189,13 +169,11 @@ const NewEventPage = () => {
                 type="file"
                 accept="image/jpeg,image/png,image/gif"
                 onChange={handleImageUpload}
-                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm file:mr-4 file:rounded-md file:border-0 file:bg-pink-500 file:px-4 file:py-2 file:text-white hover:file:bg-pink-600"
+                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm"
               />
-              {error && typeof error === 'string' && (
+              {typeof error === "string" && (
                 <p className="text-red-500 text-sm mt-1">{error}</p>
               )}
-
-              {/* Image Preview */}
               {imagePreview && (
                 <div className="mt-4">
                   <img
@@ -207,29 +185,18 @@ const NewEventPage = () => {
               )}
             </div>
 
-            {/* Status */}
+            {/* Event Date */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
-                Status<span className="text-red-500">*</span>
+                Event Date<span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <select
-                  name="status"
-                  value={newEvent.status}
-                  onChange={handleInputChange}
-                  className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all placeholder-gray-400 appearance-none bg-white pr-10"
-                  required
-                >
-                  <option value="upcoming">Upcoming</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                {error && error.some?.((e) => e.path[0] === "status") && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {error.find((e) => e.path[0] === "status")?.message}
-                  </p>
-                )}
-              </div>
+              <input
+                type="date"
+                name="eventDate"
+                value={newEvent.eventDate}
+                onChange={handleInputChange}
+                className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm"
+              />
             </div>
           </div>
         </div>
@@ -237,7 +204,7 @@ const NewEventPage = () => {
         <div className="mt-8">
           <button
             onClick={handleNewEvent}
-            className="w-full px-6 py-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 transition-all shadow-md hover:shadow-lg"
+            className="w-full px-6 py-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl"
           >
             Create Event
           </button>
