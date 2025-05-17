@@ -86,10 +86,7 @@ const Page = () => {
   }
 
   const handleNewRequest = async () => {
-    if (!userId) {
-      setError("You need to be logged in to create a request")
-      return
-    }
+    if (!userId) return
 
     try {
       InputSchema.parse({
@@ -108,9 +105,6 @@ const Page = () => {
     try {
       const response = await fetch("/api/Requests", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           ...newRequest,
           donationGoal: parseFloat(newRequest.donationGoal),
@@ -125,7 +119,7 @@ const Page = () => {
 
       const data = await response.json()
       console.log("Request created successfully:", data)
-      router.push(`/requests/${data.request._id}`)
+      router.push(`/requests`)
     } catch (error) {
       console.error("Error creating request:", error)
       setError(error.message)

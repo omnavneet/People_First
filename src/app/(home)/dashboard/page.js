@@ -82,12 +82,7 @@ const Home = () => {
   }, [])
 
   const name = user?.name
-  const TotalDonationReceived = requests?.reduce(
-    (total, request) => total + (request.donationReceived || 0),
-    0
-  )
   
-
   return (
     <div className="flex flex-col py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-green-50 min-h-screen">
       <motion.header
@@ -117,25 +112,11 @@ const Home = () => {
 
       {/* Stats Row */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8"
+        className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, staggerChildren: 0.1 }}
       >
-        <motion.div
-          className="bg-white rounded-2xl shadow-md p-6 flex items-center transition-all hover:shadow-lg border-l-4 border-green-500"
-          whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        >
-          <div>
-            <p className="text-sm text-gray-500 font-medium">
-              Total Funds Raised
-            </p>
-            <p className="text-3xl font-bold text-gray-800">
-              ₹{TotalDonationReceived?.toLocaleString() || "0"}
-            </p>
-          </div>
-        </motion.div>
-
         <motion.div
           className="bg-white rounded-2xl shadow-md p-6 flex items-center transition-all hover:shadow-lg border-l-4 border-blue-500"
           whileHover={{ y: -5, transition: { duration: 0.2 } }}

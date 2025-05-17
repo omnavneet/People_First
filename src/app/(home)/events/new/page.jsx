@@ -99,7 +99,6 @@ const NewEventPage = () => {
     try {
       const response = await fetch("/api/Events", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...newEvent,
           user: userId,
@@ -113,7 +112,7 @@ const NewEventPage = () => {
       }
 
       const data = await response.json()
-      router.push(`/events/${data?.event?._id}`)
+      router.push(`/events`)
     } catch (error) {
       setError(error.message || "Event creation failed")
     }

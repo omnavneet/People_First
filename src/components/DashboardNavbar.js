@@ -2,7 +2,7 @@
 import React from "react"
 import ForestIcon from "@mui/icons-material/Forest"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { redirect, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
@@ -15,6 +15,22 @@ const navItems = [
   { name: "Community", href: "/community" },
   { name: "AI Companion", href: "/ai-companion" },
 ]
+
+const handleLogout = () => {
+  const response = fetch("/api/auth/logout", {
+    method: "POST",
+  })
+    .then((response) => {
+      if (response.ok) {
+        redirect("/sign-in")
+      } else {
+        console.error("Logout failed")
+      }
+    })
+    .catch((error) => {
+      console.log("Error during logout:", error)
+    })
+}
 
 const Sidebar = () => {
   const pathname = usePathname()
@@ -83,6 +99,7 @@ const Sidebar = () => {
           className="w-full flex items-center space-x-3 p-3 rounded-lg bg-red-200 text-red-600 transition-all duration-200"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          onClick={handleLogout}
         >
           <ExitToAppIcon fontSize="small" className="ml-2" />
           <span className="font-medium">Logout</span>

@@ -2,20 +2,24 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
+import { motion } from "framer-motion"
 
-const signIn = () => {
+const SignIn = () => {
   const [userName, setUserName] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const signInSchema = z.object({
-    userName: z.string().min(3, "User Name must be at least 5 characters long"),
+    userName: z.string().min(3, "User Name must be at least 3 characters long"),
     password: z.string().min(6, "Password must be at least 6 characters"),
   })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsLoading(true)
+    setError("")
 
     const result = signInSchema.safeParse({
       userName,
@@ -25,11 +29,11 @@ const signIn = () => {
     if (!result.success) {
       const firstError = result.error.issues[0].message
       setError(firstError)
+      setIsLoading(false)
       return
     }
 
     const formData = new FormData()
-
     formData.append("userName", userName)
     formData.append("password", password)
 
@@ -48,13 +52,15 @@ const signIn = () => {
 
       if (data.error) {
         setError(data.error)
+        setIsLoading(false)
         return
       }
 
       router.push("/dashboard")
-      console.log(data)
     } catch (error) {
       console.error(error)
+      setError(error.message || "Failed to sign in. Please try again.")
+      setIsLoading(false)
     }
   }
 
@@ -63,30 +69,52 @@ const signIn = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="w-full max-w-md px-8 py-10 bg-white rounded-xl shadow-md transform transition duration-500 hover:shadow-lg">
-        <div className="border-l-4 border-green-500 pl-4 mb-6">
-          <h1 className="text-4xl font-bold text-gray-800">Welcome,</h1>
-          <h1 className="text-2xl font-semibold text-gray-600 mt-1">
-            Sign in to continue!
-          </h1>
-        </div>
+    <div className="flex flex-col py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-green-50 min-h-screen items-center justify-center">
+      <motion.div
+        className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 border border-gray-100"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome</h1>
+          <p className="text-lg text-gray-600">
+            Sign in to continue making a difference in your community
+          </p>
+        </motion.div>
 
-        <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-1">
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <motion.div
+            className="space-y-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
             <label className="block text-sm font-medium text-gray-700">
-              User Name
+              Username
             </label>
             <input
               type="text"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              placeholder="Enter your username"
               required
+              disabled={isLoading}
             />
-          </div>
+          </motion.div>
 
-          <div className="space-y-1">
+          <motion.div
+            className="space-y-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
             <label className="block text-sm font-medium text-gray-700">
               Password
             </label>
@@ -94,39 +122,95 @@ const signIn = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              placeholder="Enter your password"
               required
+              disabled={isLoading}
             />
-          </div>
+          </motion.div>
 
-          <button
-            type="submit"
-            className="w-full py-3 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition-all duration-200 hover:-translate-y-0.5"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="pt-2"
           >
-            Sign In
-          </button>
+            <motion.button
+              type="submit"
+              className="w-full py-3 bg-blue-600 text-white font-medium rounded-xl shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex justify-center items-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Signing In...
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </motion.button>
+          </motion.div>
 
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+            <motion.div
+              className="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.3 }}
+            >
               <p className="text-red-700 text-sm font-medium">{error}</p>
-            </div>
+            </motion.div>
           )}
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
-            <button
-              onClick={goToSignUp}
-              className="font-medium text-green-600 hover:text-green-800 underline transition duration-200"
+        <motion.div
+          className="mt-8 flex justify-between items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <a
+            href="#"
+            className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            Forgot password?
+          </a>
+          <button
+            onClick={goToSignUp}
+            className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
+          >
+            Create account
+          </button>
+        </motion.div>
+
+        <motion.div
+          className="mt-8 pt-6 border-t border-gray-200"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <motion.button
+              className="p-3 bg-gray-50 rounded-xl text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors flex items-center justify-center"
+              whileHover={{ scale: 1.05, backgroundColor: "#f3f4f6" }}
+              whileTap={{ scale: 0.98 }}
             >
-              Sign Up
-            </button>
-          </p>
-        </div>
-      </div>
+              Visit Homepage
+            </motion.button>
+            <motion.button
+              className="p-3 bg-purple-50 rounded-xl text-purple-700 text-sm font-medium hover:bg-purple-100 transition-colors flex items-center justify-center"
+              whileHover={{ scale: 1.05, backgroundColor: "#f3e8ff" }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Contact Support
+            </motion.button>
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
 
-export default signIn
+export default SignIn

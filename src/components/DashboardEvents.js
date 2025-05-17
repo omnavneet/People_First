@@ -75,15 +75,12 @@ const DashboardEvents = () => {
                     {event.title}
                   </h3>
                   <span className="text-xs font-medium bg-pink-100 text-pink-800 px-2 py-1 rounded-full">
-                    {new Date(event.createdAt).toLocaleDateString()}
+                    {new Date(event.eventDate).toLocaleDateString()}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                   {event.description}
                 </p>
-                <div className="flex items-center text-sm text-gray-500">
-                  <span>Bringing communities together</span>
-                </div>
               </motion.div>
             ))}
             <motion.button
