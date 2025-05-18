@@ -9,12 +9,12 @@ export async function GET(req) {
   await connectionDB()
   const cookie = (await cookies(req)).get("auth_token")
   const token = cookie.value
-  console.log(cookie)
+  // console.log(cookie)
 
   if (!token) {
     return NextResponse.json({ error: "No token provided" })
   }
-  console.log(token)
+  // console.log(token)
 
   try {
     const { payload } = await jwtVerify(

@@ -327,14 +327,25 @@ const Page = () => {
               </motion.button>
 
               {userID === requestMakerID && (
-                <motion.button
-                  onClick={handleDelete}
-                  className="py-3 w-full bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Delete Request
-                </motion.button>
+                <>
+                  <motion.button
+                    onClick={() => router.push(`/requests/edit/${id}`)}
+                    className="py-3 w-full bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Edit Request
+                  </motion.button>
+
+                  <motion.button
+                    onClick={handleDelete}
+                    className="py-3 w-full bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Delete Request
+                  </motion.button>
+                </>
               )}
             </motion.div>
           )}
