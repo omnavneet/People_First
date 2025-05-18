@@ -11,8 +11,10 @@ const EventDetailPage = () => {
   const [eventOrganizerID, setEventOrganizerID] = useState(null)
   const [userName, setUserName] = useState("Anonymous")
   const [userImage, setUserImage] = useState("")
-  const [isLiked, setIsLiked] = useState(false)
+  const [isVolunteering, setIsVolunteering] = useState(false)
   const [formattedEventDate, setFormattedEventDate] = useState("")
+  const [comment, setComment] = useState("")
+  const [comments, setComments] = useState([])
 
   const handleShare = async () => {
     try {
@@ -26,12 +28,12 @@ const EventDetailPage = () => {
     }
   }
 
-  const handleLikeToggle = async () => {
-    console.log("Like button clicked")
+  const handleVolunteerToggle = async () => {
+    console.log("Volunteer button clicked")
     if (!userID) return
 
     try {
-      const response = await fetch(`/api/Events/${id}`, {
+      const response = await fetch(`/api/Events/${id}/volunteer`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -41,11 +43,37 @@ const EventDetailPage = () => {
 
       if (response.ok) {
         const updatedEvent = await response.json()
-        setIsLiked(updatedEvent.likedBy.some(user => user._id === userID || user === userID))
+        setIsVolunteering(updatedEvent.volunteers.some(user => user._id === userID || user === userID))
         setEvent(updatedEvent)
       }
     } catch (error) {
-      console.error("Error toggling like:", error)
+      console.error("Error toggling volunteer status:", error)
+    }
+  }
+
+  const handlePostComment = async (e) => {
+    e.preventDefault()
+    if (!userID || !comment.trim()) return
+
+    try {
+      const response = await fetch(`/api/Events/${id}/comments`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: userID,
+          content: comment
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setComments(data.comments)
+        setComment("")
+      }
+    } catch (error) {
+      console.error("Error posting comment:", error)
     }
   }
 
@@ -93,12 +121,13 @@ const EventDetailPage = () => {
 
       setEvent(data)
       setEventOrganizerID(data?.user?._id)
+      setComments(data.comments || [])
 
-      if (userID && data.likedBy) {
-        const hasLiked = data.likedBy.some(
+      if (userID && data.volunteers) {
+        const isUserVolunteering = data.volunteers.some(
           user => (typeof user === 'object' ? user._id === userID : user === userID)
         )
-        setIsLiked(hasLiked)
+        setIsVolunteering(isUserVolunteering)
       }
     } catch (e) {
       console.error("Error fetching event:", e)
@@ -240,6 +269,69 @@ const EventDetailPage = () => {
             {event.description}
           </p>
         </motion.div>
+
+        {/* Comments Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-8"
+        >
+          <h2 className="text-xl font-semibold mb-4">Comments</h2>
+
+          {/* Comment Form */}
+          {userID && (
+            <form onSubmit={handlePostComment} className="mb-6">
+              <div className="flex">
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-grow p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  rows="2"
+                />
+                <button
+                  type="submit"
+                  disabled={!comment.trim()}
+                  className="bg-indigo-600 text-white px-4 rounded-r-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-300"
+                >
+                  Post
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Comments List */}
+          <div className="space-y-4">
+            {comments && comments.length > 0 ? (
+              comments.map((comment, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                >
+                  <div className="flex items-center mb-2">
+                    <img
+                      src={comment.user?.profilePicture || "/placeholder-user.png"}
+                      alt="User"
+                      className="w-8 h-8 rounded-full mr-2"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-800">
+                        {comment.user?.name || "Anonymous"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(comment.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-gray-700">{comment.content}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 italic">No comments yet. Be the first to comment!</p>
+            )}
+          </div>
+        </motion.div>
       </div>
 
       {/* Right Column - Event Details */}
@@ -281,17 +373,19 @@ const EventDetailPage = () => {
             <div className="flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-red-500 mr-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+                className="h-5 w-5 text-green-500 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
                 <path
-                  fillRule="evenodd"
-                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                  clipRule="evenodd"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span className="text-gray-700">{event.likes || 0} likes</span>
+              <span className="text-gray-700">{event.volunteers?.length || 0} volunteers</span>
             </div>
           </div>
 
@@ -312,16 +406,16 @@ const EventDetailPage = () => {
             </motion.button>
 
             <motion.button
-              onClick={handleLikeToggle}
-              className={`py-3 w-full text-white rounded-lg transition-all ${isLiked
-                ? "bg-red-500 hover:bg-red-600"
+              onClick={handleVolunteerToggle}
+              className={`py-3 w-full text-white rounded-lg transition-all ${isVolunteering
+                ? "bg-green-500 hover:bg-green-600"
                 : "bg-indigo-600 hover:bg-indigo-700"
                 }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               disabled={!userID}
             >
-              {isLiked ? "Unlike" : "Like"}
+              {isVolunteering ? "Cancel Volunteering" : "Volunteer"}
             </motion.button>
 
             {userID === eventOrganizerID && (
@@ -378,19 +472,72 @@ const EventDetailPage = () => {
           </div>
 
           <div className="relative pl-4 border-l-2 border-purple-200">
-            <p className="text-gray-800 text-[17px]">
+            <p className="text-gray-800 text-lg">
               {formattedEventDate}
             </p>
           </div>
         </motion.div>
 
+        {/* Volunteers Section */}
+        <motion.div
+          className="mt-3 px-3 py-3 rounded-lg bg-gradient-to-br from-green-50 to-teal-50 border border-green-100 shadow-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
+              Volunteers
+            </h2>
+          </div>
+
+          <div className="relative pl-4 border-l-2 border-green-200">
+            {event.volunteers && event.volunteers.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {event.volunteers.map((volunteer, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-white px-3 py-1 rounded-full border border-green-200"
+                  >
+                    <img
+                      src={volunteer.profilePicture || "/placeholder-user.png"}
+                      alt={volunteer.name}
+                      className="w-6 h-6 rounded-full mr-2"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      {volunteer.name || "Volunteer"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">No volunteers yet. Be the first to volunteer!</p>
+            )}
+          </div>
+        </motion.div>
 
         {/*AI analysis*/}
         <motion.div
           className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.9 }}
         >
           <div className="flex items-center mb-4">
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
@@ -424,7 +571,7 @@ const EventDetailPage = () => {
               </div>
 
               <div className="relative pl-4 border-l-2 border-purple-200">
-                <p className="text-gray-800 italic text-[17px]">
+                <p className="text-gray-800 italic text-lg">
                   {event.eventAnalysis.reason}
                 </p>
               </div>

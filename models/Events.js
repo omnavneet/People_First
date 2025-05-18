@@ -1,13 +1,27 @@
 import mongoose from "mongoose"
 
+const CommentSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
+    content: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 const EventSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     image: { type: String, required: true },
-    likes: { type: Number, default: 0 },
-    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
+    volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
+    comments: [CommentSchema],
     status: {
       type: String,
       enum: ["upcoming", "completed", "cancelled"],
