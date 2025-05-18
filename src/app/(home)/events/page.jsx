@@ -106,8 +106,8 @@ const EventsPage = () => {
               type="button"
               onClick={() => setCurrentView("all")}
               className={`px-4 py-2 text-sm font-medium rounded-l-lg ${currentView === "all"
-                  ? "bg-pink-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-100"
+                ? "bg-pink-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-100"
                 } border border-gray-200 focus:z-10 focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50`}
             >
               All Events
@@ -116,8 +116,8 @@ const EventsPage = () => {
               type="button"
               onClick={() => setCurrentView("your")}
               className={`px-4 py-2 text-sm font-medium rounded-r-lg ${currentView === "your"
-                  ? "bg-pink-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-100"
+                ? "bg-pink-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-100"
                 } border border-gray-200 focus:z-10 focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50`}
             >
               Your Events
@@ -221,20 +221,22 @@ const EventsPage = () => {
                       {new Date(event.eventDate).toLocaleDateString()}
                     </div>
 
-                    <div className="flex items-center text-sm">
+                    <div className="flex items-center">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1 text-red-500"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                        className="h-5 w-5 text-green-500 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
                         <path
-                          fillRule="evenodd"
-                          d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                          clipRule="evenodd"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                         />
                       </svg>
-                      <span className="font-medium">{event.likes || 0}</span>
+                      <span className="text-gray-700">{event.volunteers?.length || 0}</span>
                     </div>
                   </div>
                 </div>
