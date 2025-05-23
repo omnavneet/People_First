@@ -3,6 +3,46 @@ import { useParams, useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
+const LoadingSkeleton = ({ className }) => (
+  <div className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] ${className}`}>
+    <div className="animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+  </div>
+)
+
+const Status = ({ status }) => {
+  const getStatusConfig = (status) => {
+    switch (status?.toLowerCase()) {
+      case "completed":
+        return {
+          color: "bg-gradient-to-r from-green-500 to-emerald-600",
+          text: "COMPLETED"
+        }
+      case "cancelled":
+        return {
+          color: "bg-gradient-to-r from-red-500 to-rose-600",
+          text: "CANCELLED"
+        }
+      default:
+        return {
+          color: "bg-gradient-to-r from-blue-500 to-indigo-600",
+          text: "UPCOMING"
+        }
+    }
+  }
+
+  const config = getStatusConfig(status)
+
+  return (
+    <motion.div
+      className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg ${config.color}`}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      {config.text}
+    </motion.div>
+  )
+}
+
 const EventDetailPage = () => {
   const { id } = useParams()
   const router = useRouter()
@@ -15,6 +55,7 @@ const EventDetailPage = () => {
   const [formattedEventDate, setFormattedEventDate] = useState("")
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const handleShare = async () => {
     try {
@@ -111,6 +152,8 @@ const EventDetailPage = () => {
 
   const fetchEventData = async () => {
     if (!id) return
+
+    setLoading(true)
     try {
       const response = await fetch(`/api/Events/${id}`, {
         method: "GET",
@@ -131,6 +174,8 @@ const EventDetailPage = () => {
       }
     } catch (e) {
       console.error("Error fetching event:", e)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -180,62 +225,55 @@ const EventDetailPage = () => {
     fetchUserName()
   }, [eventOrganizerID])
 
-  // status color
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "upcoming":
-        return "bg-blue-500"
-      case "completed":
-        return "bg-green-500"
-      case "cancelled":
-        return "bg-red-500"
-      default:
-        return "bg-gray-500"
-    }
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <LoadingSkeleton className="h-8 w-3/4 rounded-lg" />
+              <LoadingSkeleton className="h-6 w-1/4 rounded-full" />
+              <LoadingSkeleton className="h-64 w-full rounded-2xl" />
+              <LoadingSkeleton className="h-32 w-full rounded-xl" />
+            </div>
+            <div className="space-y-4">
+              <LoadingSkeleton className="h-80 w-full rounded-2xl" />
+              <LoadingSkeleton className="h-32 w-full rounded-2xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="grid md:grid-cols-3 gap-4 py-6">
       {/* Left Column - Image and Details */}
-      <div className="md:col-span-2">
+      <div className="md:col-span-2 px-2">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.3 }}
           className="mb-4"
         >
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
             {event.title}
           </h1>
-          <div
-            className={`inline-block px-2 py-1 rounded-lg text-sm text-white ${getStatusColor(
-              event.status
-            )}`}
-          >
-            {event.status?.toUpperCase()}
-          </div>
+          <Status status={event.status} />
         </motion.div>
 
-        {event.image ? (
+        {event.image && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
             className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"
           >
             <img
               src={event.image}
               alt={event.title}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-full aspect-video flex items-center justify-center text-gray-400 bg-gray-100 rounded-lg"
-          >
           </motion.div>
         )}
 
@@ -244,30 +282,34 @@ const EventDetailPage = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-4 flex items-center space-x-3"
+          className="mt-6 flex items-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100"
         >
           <img
             src={userImage || "/placeholder-user.png"}
             alt="Organizer"
-            className="w-10 h-10 rounded-full"
+            className="w-14 h-14 rounded-full border-3 border-white shadow-md mr-4"
           />
           <div>
             <p className="font-semibold text-gray-800">Organized by</p>
-            <p className="text-sm text-gray-600">{userName}</p>
+            <p className="text-sm text-gray-800">{userName}</p>
           </div>
         </motion.div>
 
         {/* Description */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="bg-white rounded-2xl shadow-xl p-4 border border-gray-100"
         >
-          <h2 className="text-xl font-semibold mb-2">Description</h2>
-          <p className="text-gray-700 whitespace-pre-line">
-            {event.description}
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3 flex items-center">
+            Description
+          </h2>
+          <div className="prose prose-lg max-w-none">
+            <p className="text-gray-800">
+              {event.description}
+            </p>
+          </div>
         </motion.div>
 
         {/* Comments Section */}
@@ -275,9 +317,9 @@ const EventDetailPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-8"
+          className="bg-white rounded-2xl shadow-xl p-4 border border-gray-100 mt-1"
         >
-          <h2 className="text-xl font-semibold mb-4">Comments</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3 flex items-center">Comments</h2>
 
           {/* Comment Form */}
           {userID && (
@@ -286,14 +328,14 @@ const EventDetailPage = () => {
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="flex-grow p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  rows="2"
+                  placeholder="Add a comment"
+                  className="w-full p-4 border-0 bg-transparent resize-none focus:outline-none text-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 rounded-lg"
+                  rows="1"
                 />
                 <button
                   type="submit"
                   disabled={!comment.trim()}
-                  className="bg-indigo-600 text-white px-4 rounded-r-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-300"
+                  className="bg-indigo-600 text-white ml-1 px-8 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-300"
                 >
                   Post
                 </button>
@@ -302,22 +344,22 @@ const EventDetailPage = () => {
           )}
 
           {/* Comments List */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             {comments && comments.length > 0 ? (
               comments.map((comment, index) => (
                 <div
                   key={index}
-                  className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                  className="bg-gray-100 rounded-xl py-2 px-4 shadow-md border border-gray-100 transition-all duration-300"
                 >
                   <div className="flex items-center mb-2">
                     <img
                       src={comment.user?.profilePicture || "/placeholder-user.png"}
                       alt="User"
-                      className="w-8 h-8 rounded-full mr-2"
+                      className="w-12 h-12 rounded-full mr-4 border-2 border-gray-200"
                     />
                     <div>
-                      <p className="font-medium text-gray-800">
-                        {comment.user?.name || "Anonymous"}
+                      <p className="font-semibold text-gray-900">
+                        {comment.user?.name}
                       </p>
                       <p className="text-xs text-gray-500">
                         {new Date(comment.createdAt).toLocaleString()}
@@ -363,7 +405,7 @@ const EventDetailPage = () => {
                 <span className="text-gray-700">
                   Created: {new Date(event.createdAt).toLocaleDateString("en-US", {
                     year: "numeric",
-                    month: "long",
+                    month: "short",
                     day: "numeric",
                   })}
                 </span>
@@ -391,55 +433,78 @@ const EventDetailPage = () => {
 
           {/* Action Buttons */}
           <motion.div
-            className="text-center flex flex-col items-center space-y-2"
-            initial={{ opacity: 0, scale: 0.9 }}
+            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3"
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
           >
+            {/* Share */}
             <motion.button
               onClick={handleShare}
-              className="py-3 w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
+              whileHover={{ scale: 1.01 }}
             >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+              </svg>
               Share
             </motion.button>
 
+            {/* Volunteer / Unvolunteer */}
             <motion.button
               onClick={handleVolunteerToggle}
-              className={`py-3 w-full text-white rounded-lg transition-all ${isVolunteering
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-indigo-600 hover:bg-indigo-700"
-                }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               disabled={!userID}
+              className={`flex items-center justify-center gap-2 font-medium px-4 py-2 rounded-md shadow-sm transition text-white ${isVolunteering
+                  ? "bg-yellow-600 hover:bg-yellow-700"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+                } ${!userID && "opacity-50 cursor-not-allowed"}`}
+              whileHover={{ scale: 1.01 }}
             >
-              {isVolunteering ? "Cancel Volunteering" : "Volunteer"}
+              {isVolunteering ? (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Unvolunteer
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  Volunteer
+                </>
+              )}
             </motion.button>
 
+            {/* Edit Button (Organizer Only) */}
             {userID === eventOrganizerID && (
               <>
                 <motion.button
                   onClick={() => router.push(`/events/edit/${id}`)}
-                  className="py-3 w-full bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
+                  whileHover={{ scale: 1.01 }}
                 >
-                  Edit Event
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit
                 </motion.button>
 
                 <motion.button
                   onClick={handleDelete}
-                  className="py-3 w-full bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
+                  whileHover={{ scale: 1.01 }}
                 >
-                  Delete Event
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Delete
                 </motion.button>
               </>
             )}
           </motion.div>
+
         </motion.div>
 
         {/* Event Date */}
