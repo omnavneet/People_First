@@ -4,14 +4,47 @@ import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import DashboardRequest from "../../../components/DashboardRequest"
 import DashboardEvents from "../../../components/DashboardEvents"
-                  
+import News from "../../../components/News"
+
+const LoadingSkeleton = ({ className }) => (
+  <div
+    className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] ${className}`}
+  >
+    <div className="animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+  </div>
+)
+
+const StatCard = ({ title, value, color, isLoading }) => (
+  <motion.div
+    className={`bg-white rounded-xl shadow-lg p-6 transition-all hover:shadow-xl border-l-4 border-${color}-500 relative overflow-hidden`}
+    whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    <div className="relative z-10">
+      <p className="text-sm text-gray-500 font-medium uppercase tracking-wide mb-2">
+        {title}
+      </p>
+      {isLoading ? (
+        <LoadingSkeleton className="h-8 w-16 rounded" />
+      ) : (
+        <p className={`text-3xl font-bold text-${color}-600`}>{value}</p>
+      )}
+    </div>
+    <div
+      className={`absolute top-0 right-0 w-20 h-20 bg-${color}-100 rounded-full -mr-10 -mt-10 opacity-30`}
+    ></div>
+  </motion.div>
+)
+
 const Home = () => {
   const [user, setUser] = useState(null)
   const [events, setEvents] = useState(null)
   const [requests, setRequests] = useState(null)
   const [userloading, setUserLoading] = useState(true)
-
-  const router = useRouter()
+  const [eventsLoading, setEventsLoading] = useState(true)
+  const [requestsLoading, setRequestsLoading] = useState(true)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -26,9 +59,9 @@ const Home = () => {
         }
         const data = await response.json()
         setUser(data)
-        setUserLoading(false)
       } catch (e) {
         console.log(e)
+      } finally {
         setUserLoading(false)
       }
     }
@@ -37,7 +70,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchEvents = async () => {
-     
+      setEventsLoading(true)
       try {
         const response = await fetch("/api/Events", {
           method: "GET",
@@ -48,12 +81,14 @@ const Home = () => {
         }
 
         const data = await response.json()
-        const recentEvents = data
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        const recentEvents = data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )
         setEvents(recentEvents)
       } catch (e) {
         console.log(e)
-       
+      } finally {
+        setEventsLoading(false)
       }
     }
     fetchEvents()
@@ -61,6 +96,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchRequests = async () => {
+      setRequestsLoading(true)
       try {
         const response = await fetch("/api/Requests", {
           method: "GET",
@@ -71,137 +107,73 @@ const Home = () => {
         }
 
         const data = await response.json()
-        const recentRequests = data
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        const recentRequests = data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )
         setRequests(recentRequests)
       } catch (e) {
         console.log(e)
+      } finally {
+        setRequestsLoading(false)
       }
     }
     fetchRequests()
   }, [])
 
   const name = user?.name
-  
+
   return (
-    <div className="flex flex-col py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-green-50 min-h-screen">
-      <motion.header
-        className="text-center mb-8"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl font-bold text-gray-900 mb-3 flex items-center justify-center">
-          Welcome,
-          {userloading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin">
-                {" "}
-              </div>
-            </div>
-          ) : (
-            ` ${name}`
-          )}
-        </h1>
-
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Your compassion creates ripples of positive change. Here's the impact
-          you're making in your community.
-        </p>
-      </motion.header>
-
-      {/* Stats Row */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, staggerChildren: 0.1 }}
-      >
-        <motion.div
-          className="bg-white rounded-2xl shadow-md p-6 flex items-center transition-all hover:shadow-lg border-l-4 border-blue-500"
-          whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+      <div className="flex flex-col py-8 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto">
+        <motion.header
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          <div>
-            <p className="text-sm text-gray-500 font-medium">
-              Support Requests
-            </p>
-            <p className="text-3xl font-bold text-gray-800">
-              {requests?.length || "0"}
-            </p>
+          <div className="mb-4">
+            <h1 className="text-5xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
+              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                Welcome,
+              </span>
+              {userloading ? (
+                <LoadingSkeleton className="h-12 w-32 rounded-lg inline-block" />
+              ) : (
+                <span className="text-gray-800">{name}</span>
+              )}
+            </h1>
           </div>
-        </motion.div>
 
-        <motion.div
-          className="bg-white rounded-2xl shadow-md p-6 flex items-center transition-all hover:shadow-lg border-l-4 border-purple-500"
-          whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        >
-          <div>
-            <p className="text-sm text-gray-500 font-medium">
-              Number of Events
-            </p>
-            <p className="text-3xl font-bold text-gray-800">
-              {events?.length || "0"}
-            </p>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-
-        {/* Events Section */}
-       <DashboardEvents />
-
-        {/* Requests Section */}
-        <DashboardRequest />
-
-
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <motion.div
-            className="bg-white rounded-2xl shadow-md p-6 border border-gray-100"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6 }}
+          <motion.p
+            className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              Quick Actions
-            </h2>
-            <div className="grid grid-2 gap-3">
-              <motion.button
-                onClick={() => router.push("/requests/new")}
-                className="p-3 bg-blue-50 rounded-xl text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"
-                whileHover={{ scale: 1.05, backgroundColor: "#dbeafe" }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Create a Request
-              </motion.button>
-              <motion.button
-                onClick={() => router.push("/events/new")}
-                className="p-3 bg-green-50 rounded-xl text-green-700 text-sm font-medium hover:bg-green-100 transition-colors"
-                whileHover={{ scale: 1.05, backgroundColor: "#dcfce7" }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Create an Event
-              </motion.button>
-              <motion.button
-                onClick={() => router.push("/share")}
-                className="p-3 bg-purple-50 rounded-xl text-purple-700 text-sm font-medium hover:bg-purple-100 transition-colors"
-                whileHover={{ scale: 1.05, backgroundColor: "#f3e8ff" }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Share Impact
-              </motion.button>
-              <motion.button
-                onClick={() => router.push("/contact")}
-                className="p-3 bg-pink-50 rounded-xl text-pink-700 text-sm font-medium hover:bg-pink-100 transition-colors"
-                whileHover={{ scale: 1.05, backgroundColor: "#fce7f3" }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Contact Us
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
+            Your compassion creates ripples of positive change. Here's the
+            impact you're making in your community.
+          </motion.p>
+        </motion.header>
+
+        {/* Main Content Grid */}
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+        >
+          <div className="lg:col-span-1">
+            <DashboardEvents />
+          </div>
+
+          <div className="lg:col-span-1">
+            <DashboardRequest />
+          </div>
+
+          <div className="lg:col-span-1">
+            <News />
+          </div>
+        </motion.div>
       </div>
     </div>
   )
