@@ -50,6 +50,7 @@ const EventDetailPage = () => {
   const [event, setEvent] = useState({})
   const [eventOrganizerID, setEventOrganizerID] = useState(null)
   const [userName, setUserName] = useState("Anonymous")
+  const [userEmail, setUserEmail] = useState("")
   const [userImage, setUserImage] = useState("")
   const [isVolunteering, setIsVolunteering] = useState(false)
   const [formattedEventDate, setFormattedEventDate] = useState("")
@@ -216,6 +217,7 @@ const EventDetailPage = () => {
         })
         const data = await response.json()
         setUserName(data.name)
+        setUserEmail(data.email)
         setUserImage(data.profilePicture)
       } catch (e) {
         console.error("Error fetching user name:", e)
@@ -282,16 +284,21 @@ const EventDetailPage = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-6 flex items-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100"
+          className="mt-6 flex items-center p-5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border border-purple-100 shadow-sm"
         >
           <img
             src={userImage || "/placeholder-user.png"}
             alt="Organizer"
-            className="w-14 h-14 rounded-full border-3 border-white shadow-md mr-4"
+            className="w-14 h-14 rounded-full border-2 border-white shadow-md mr-5"
           />
           <div>
-            <p className="font-semibold text-gray-800">Organized by</p>
-            <p className="text-sm text-gray-800">{userName}</p>
+            <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+              Organized by
+            </span>
+            <p className="font-semibold text-gray-800 text-lg mt-2">{userName}</p>
+            <p className="text-sm text-gray-600 mt-1">
+              {userEmail}
+            </p>
           </div>
         </motion.div>
 
@@ -300,13 +307,13 @@ const EventDetailPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="bg-white rounded-2xl shadow-xl p-4 border border-gray-100"
+          className="bg-gray-50 rounded-2xl shadow-md p-5 border border-gray-200"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-3 flex items-center">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
             Description
           </h2>
-          <div className="prose prose-lg max-w-none">
-            <p className="text-gray-800">
+          <div className="prose prose-base max-w-none">
+            <p className="text-gray-700 leading-relaxed">
               {event.description}
             </p>
           </div>
@@ -317,9 +324,11 @@ const EventDetailPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-white rounded-2xl shadow-xl p-4 border border-gray-100 mt-1"
+          className="bg-gray-50 rounded-2xl shadow-lg p-5 mt-2 border border-gray-200"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-3 flex items-center">Comments</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+            Comments
+          </h2>
 
           {/* Comment Form */}
           {userID && (
@@ -328,14 +337,14 @@ const EventDetailPage = () => {
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add a comment"
-                  className="w-full p-4 border-0 bg-transparent resize-none focus:outline-none text-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 rounded-lg"
+                  placeholder="Write your comment..."
+                  className="w-full p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 placeholder-gray-500 resize-none"
                   rows="1"
                 />
                 <button
                   type="submit"
                   disabled={!comment.trim()}
-                  className="bg-indigo-600 text-white ml-1 px-8 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-300"
+                  className="ml-2 px-5 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300 transition-all"
                 >
                   Post
                 </button>
@@ -344,29 +353,27 @@ const EventDetailPage = () => {
           )}
 
           {/* Comments List */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             {comments && comments.length > 0 ? (
               comments.map((comment, index) => (
                 <div
                   key={index}
-                  className="bg-gray-100 rounded-xl py-2 px-4 shadow-md border border-gray-100 transition-all duration-300"
+                  className="bg-white rounded-xl py-3 px-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
                 >
                   <div className="flex items-center mb-2">
                     <img
                       src={comment.user?.profilePicture || "/placeholder-user.png"}
                       alt="User"
-                      className="w-12 h-12 rounded-full mr-4 border-2 border-gray-200"
+                      className="w-10 h-10 rounded-full mr-3 border border-gray-300"
                     />
                     <div>
-                      <p className="font-semibold text-gray-900">
-                        {comment.user?.name}
-                      </p>
+                      <p className="font-medium text-gray-900">{comment.user?.name}</p>
                       <p className="text-xs text-gray-500">
                         {new Date(comment.createdAt).toLocaleString()}
                       </p>
                     </div>
                   </div>
-                  <p className="text-gray-700">{comment.content}</p>
+                  <p className="text-gray-700 text-sm">{comment.content}</p>
                 </div>
               ))
             ) : (
@@ -382,7 +389,7 @@ const EventDetailPage = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white shadow-lg rounded-lg p-6 sticky top-4"
+          className="bg-white shadow-lg rounded-lg p-6"
         >
           {/* Event Meta Info */}
           <div className="mb-6">
@@ -455,8 +462,8 @@ const EventDetailPage = () => {
               onClick={handleVolunteerToggle}
               disabled={!userID}
               className={`flex items-center justify-center gap-2 font-medium px-4 py-2 rounded-md shadow-sm transition text-white ${isVolunteering
-                  ? "bg-yellow-600 hover:bg-yellow-700"
-                  : "bg-indigo-600 hover:bg-indigo-700"
+                ? "bg-yellow-600 hover:bg-yellow-700"
+                : "bg-indigo-600 hover:bg-indigo-700"
                 } ${!userID && "opacity-50 cursor-not-allowed"}`}
               whileHover={{ scale: 1.01 }}
             >
@@ -514,7 +521,7 @@ const EventDetailPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
-          <div className="flex items-center mb-4">
+          <div className="flex items-center mb-3">
             <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -543,9 +550,61 @@ const EventDetailPage = () => {
           </div>
         </motion.div>
 
+        {/*AI analysis*/}
+        <motion.div
+          className="mt-2 px-3 py-5 rounded-lg bg-gradient-to-br from-blue-100 to-purple-50 border border-blue-300 shadow-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+        >
+          <div className="flex items-center justify-between mb-3 pr-4">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  className="w-5 h-5"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                AI Analysis
+              </h2>
+            </div>
+
+            {event?.eventAnalysis && (
+              <div
+                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${event.eventAnalysis.judgment === "Trustworthy"
+                  ? "bg-green-500"
+                  : event.eventAnalysis.judgment === "Needs Review"
+                    ? "bg-yellow-500"
+                    : "bg-red-500"
+                  }`}
+              >
+                {event.eventAnalysis.judgment}
+              </div>
+            )}
+          </div>
+
+          {event?.eventAnalysis ? (
+            <div className="relative pl-4 border-l-2 border-purple-200">
+              <p className="text-gray-800 text-lg">
+                {event.eventAnalysis.reason}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="w-10 h-10 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-3"></div>
+              <p className="text-gray-600">Analyzing this request...</p>
+            </div>
+          )}
+        </motion.div>
+
         {/* Volunteers Section */}
         <motion.div
-          className="mt-3 px-3 py-3 rounded-lg bg-gradient-to-br from-green-50 to-teal-50 border border-green-100 shadow-sm"
+          className="mt-2 px-3 py-3 rounded-lg bg-gradient-to-br from-green-50 to-teal-50 border border-green-100 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
@@ -572,81 +631,17 @@ const EventDetailPage = () => {
             </h2>
           </div>
 
-          <div className="relative pl-4 border-l-2 border-green-200">
+          <div className="relative pl-4">
             {event.volunteers && event.volunteers.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
+              <ul className="list-disc list-inside text-md text-gray-800 pl-1">
                 {event.volunteers.map((volunteer, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center bg-white px-3 py-1 rounded-full border border-green-200"
-                  >
-                    <img
-                      src={volunteer.profilePicture || "/placeholder-user.png"}
-                      alt={volunteer.name}
-                      className="w-6 h-6 rounded-full mr-2"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      {volunteer.name || "Volunteer"}
-                    </span>
-                  </div>
+                  <li key={index}>{volunteer.name}</li>
                 ))}
-              </div>
+              </ul>
             ) : (
-              <p className="text-gray-500 italic">No volunteers yet. Be the first to volunteer!</p>
+              <p className="text-gray-500 italic pl-1">No volunteers yet. Be the first to volunteer!</p>
             )}
           </div>
-        </motion.div>
-
-        {/*AI analysis*/}
-        <motion.div
-          className="mt-3 px-3 py-5 rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-        >
-          <div className="flex items-center mb-4">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="white"
-                className="w-5 h-5"
-              >
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              AI Analysis
-            </h2>
-          </div>
-
-          {event?.eventAnalysis ? (
-            <>
-              <div className="flex items-center mb-3">
-                <div
-                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${event.eventAnalysis.judgment === "Trustworthy"
-                    ? "bg-green-500"
-                    : event.eventAnalysis.judgment === "Needs Review"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                    }`}
-                >
-                  {event.eventAnalysis.judgment}
-                </div>
-              </div>
-
-              <div className="relative pl-4 border-l-2 border-purple-200">
-                <p className="text-gray-800 italic text-lg">
-                  {event.eventAnalysis.reason}
-                </p>
-              </div>
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-4">
-              <div className="w-10 h-10 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-3"></div>
-              <p className="text-gray-600">Analyzing this request...</p>
-            </div>
-          )}
         </motion.div>
       </div>
     </div>

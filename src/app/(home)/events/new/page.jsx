@@ -210,30 +210,6 @@ const NewEventPage = () => {
                     placeholder="Describe your event..."
                   />
                 </div>
-
-                {/* Status Dropdown */}
-                <div className="transform transition-all duration-200">
-                  <label className="block text-gray-700 font-semibold mb-2">
-                    Event Status<span className="text-pink-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      name="status"
-                      value={newEvent.status}
-                      onChange={handleInputChange}
-                      className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm appearance-none focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-200"
-                    >
-                      <option value="upcoming">Upcoming</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               <div className="space-y-6">
