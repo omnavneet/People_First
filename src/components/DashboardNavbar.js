@@ -12,8 +12,8 @@ const navItems = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Requests", href: "/requests" },
   { name: "Events", href: "/events" },
-  { name: "Community", href: "/community" },
-  { name: "AI Companion", href: "/ai-companion" },
+  { name: "Alert Center", href: "/alert-center" },
+  { name: "Support & Info", href: "/support-info" },
 ]
 
 const handleLogout = () => {
@@ -64,19 +64,7 @@ const Sidebar = () => {
                     : "text-black hover:bg-green-200"
                 } transition-all duration-200`}
               >
-                {item.href === "/ai-companion" ? (
-                  <>
-                    <div className="flex items-center gap-1">
-                      <SmartToyIcon
-                        fontSize="small"
-                        className="text-cyan-600"
-                      />
-                      {item.name}
-                    </div>
-                  </>
-                ) : (
-                  item.name
-                )}
+                {item.name}
               </Link>
             )
           })}

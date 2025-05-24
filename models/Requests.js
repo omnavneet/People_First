@@ -1,5 +1,23 @@
 import mongoose from "mongoose"
 
+const DonationSchema = new mongoose.Schema(
+  {
+    amount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    donor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 const RequestSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -12,9 +30,10 @@ const RequestSchema = new mongoose.Schema(
       enum: ["active", "fulfilled", "urgent"],
       default: "active",
     },
+    donors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
+    donations: [DonationSchema],
     donationReceived: { type: Number, default: 0 },
     image: { type: String, default: "" },
-
     trustAnalysis: {
       summary: { type: String },
       judgment: {

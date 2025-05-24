@@ -511,7 +511,6 @@ const EventDetailPage = () => {
               </>
             )}
           </motion.div>
-
         </motion.div>
 
         {/* Event Date */}
