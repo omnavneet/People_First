@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 const NewsCardSkeleton = () => (
   <div className="bg-white rounded-xl shadow-sm border p-6 mb-4">
@@ -79,6 +80,8 @@ const News = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const router = useRouter()
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
@@ -111,26 +114,34 @@ const News = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-red-100 rounded-lg">
-            <svg
-              className="w-6 h-6 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+        <div className="flex items-center justify-between space-x-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <svg
+                className="w-6 h-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Crisis Intel</h2>
+              <p className="text-sm text-gray-500">Disaster Updates</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Crisis Intel</h2>
-            <p className="text-sm text-gray-500">Disaster Updates</p>
-          </div>
+          <button
+            onClick={() => router.push("/disaster-updates")}
+            className="py-2 px-4 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+          >
+            All Updates
+          </button>
         </div>
       </div>
 

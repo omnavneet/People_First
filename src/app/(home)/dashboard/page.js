@@ -124,7 +124,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-      <div className="flex flex-col py-8 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto">
+      <div className="flex flex-col py-8 px-4 sm:px-6 md:px-8 lg:px-12 max-w-8xl mx-auto">
         <motion.header
           className="text-center mb-12"
           initial={{ opacity: 0, y: -30 }}
@@ -157,7 +157,7 @@ const Home = () => {
 
         {/* Main Content Grid */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.6 }}

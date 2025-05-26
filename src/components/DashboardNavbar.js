@@ -6,13 +6,12 @@ import { redirect, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
-import SmartToyIcon from "@mui/icons-material/SmartToy"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Requests", href: "/requests" },
   { name: "Events", href: "/events" },
-  { name: "Alert Center", href: "/alert-center" },
+  { name: "Disaster Updates", href: "/disaster-updates" },
   { name: "Support & Info", href: "/support-info" },
 ]
 
