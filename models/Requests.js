@@ -12,11 +12,17 @@ const DonationSchema = new mongoose.Schema(
       ref: "Users",
       required: true,
     },
+    paymentIntentId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
   },
   {
     timestamps: true,
   }
-)
+);
+
 
 const RequestSchema = new mongoose.Schema(
   {

@@ -68,7 +68,7 @@ const EditRequestPage = () => {
                     })
                     setImagePreview(data.image)
                     setIsLoading(false)
-                }, 800) // Add slight delay for smoother loading transition
+                }, 800) 
             } catch (e) {
                 console.error("Error fetching request data:", e)
                 setError("Failed to load request details.")
@@ -137,10 +137,9 @@ const EditRequestPage = () => {
                 throw new Error(errorText)
             }
 
-            // Show success toast
             setShowSuccessToast(true)
 
-            // Delay navigation for better UX
+            // Delay navigation
             setTimeout(() => {
                 router.push(`/requests/${id}`)
             }, 1500)
@@ -203,7 +202,7 @@ const EditRequestPage = () => {
                                 {/* Title */}
                                 <div className="transform transition-all duration-200">
                                     <label className="block text-gray-700 font-semibold mb-2">
-                                        Title<span className="text-green-500">*</span>
+                                        Title<span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -224,7 +223,7 @@ const EditRequestPage = () => {
                                 {/* Description */}
                                 <div className="transform transition-all duration-200">
                                     <label className="block text-gray-700 font-semibold mb-2">
-                                        Description<span className="text-green-500">*</span>
+                                        Description<span className="text-red-500">*</span>
                                     </label>
                                     <textarea
                                         name="description"
@@ -247,7 +246,7 @@ const EditRequestPage = () => {
                                 {/* Donation */}
                                 <div className="transform transition-all duration-200">
                                     <label className="block text-gray-700 font-semibold mb-2">
-                                        Donation Goal (₹)<span className="text-green-500">*</span>
+                                        Donation Goal (₹)<span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <span className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -274,7 +273,7 @@ const EditRequestPage = () => {
                                 {/* Status */}
                                 <div className="transform transition-all duration-200">
                                     <label className="block text-gray-700 font-semibold mb-2">
-                                        Status<span className="text-green-500">*</span>
+                                        Status<span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <select
@@ -304,7 +303,7 @@ const EditRequestPage = () => {
                                 {/* Image Upload */}
                                 <div className="transform transition-all duration-200">
                                     <label className="block text-gray-700 font-semibold mb-2">
-                                        Request Image
+                                        Image
                                     </label>
                                     <div className="relative">
                                         <input

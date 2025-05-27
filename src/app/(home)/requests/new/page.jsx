@@ -47,7 +47,7 @@ const Page = () => {
       } finally {
         setTimeout(() => {
           setIsLoading(false)
-        }, 800) // Add slight delay for smoother loading transition
+        }, 800) 
       }
     }
 

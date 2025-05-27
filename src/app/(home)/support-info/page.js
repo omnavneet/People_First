@@ -2,7 +2,7 @@
 import React, { useState } from "react"
 
 const DisasterCard = ({ disaster, actions }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-200 transition-all duration-200">
+  <div className="bg-white rounded-lg border border-gray-200 hover:border-blue-200 transition-all duration-200">
     <div className="flex items-center space-x-3 mb-4">
       <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
         <span className="text-xl">{disaster.icon}</span>

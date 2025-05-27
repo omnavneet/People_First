@@ -9,7 +9,9 @@ import CheckoutForm from "../../../../components/CheckoutForm"
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 const LoadingSkeleton = ({ className }) => (
-  <div className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] ${className}`}>
+  <div
+    className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] ${className}`}
+  >
     <div className="animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
   </div>
 )
@@ -20,17 +22,17 @@ const Status = ({ status }) => {
       case "fulfilled":
         return {
           color: "bg-gradient-to-r from-green-500 to-emerald-600",
-          text: "FULFILLED"
+          text: "FULFILLED",
         }
       case "urgent":
         return {
           color: "bg-gradient-to-r from-red-500 to-rose-600",
-          text: "URGENT"
+          text: "URGENT",
         }
       default:
         return {
           color: "bg-gradient-to-r from-blue-500 to-indigo-600",
-          text: "ACTIVE"
+          text: "ACTIVE",
         }
     }
   }
@@ -125,10 +127,23 @@ const Page = () => {
       const response = await fetch(`/api/Requests/${id}`, {
         method: "GET",
       })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const data = await response.json()
 
       setRequest(data)
-      setRequestMakerID(data.user._id)
+      setRequestMakerID(data.user?._id)
+
+      // Set user information if available
+      if (data.user) {
+        setUserName(data.user.name || "Anonymous")
+        setUserEmail(data.user.email || "")
+        setUserImage(data.user.profilePicture || "")
+      }
+
     } catch (e) {
       console.error("Error fetching request:", e)
     } finally {
@@ -216,45 +231,48 @@ const Page = () => {
           <Status status={request.status} />
         </motion.div>
 
-        {request.image ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"
-          >
-            <img
-              src={request.image}
-              alt={request.title}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-full aspect-video flex items-center justify-center text-gray-400 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border-2 border-dashed border-gray-300"
-          >
-            <div className="text-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-16 w-16 text-gray-400 mx-auto mb-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <p className="text-gray-500">No image provided</p>
-            </div>
-          </motion.div>
-        )}
+        <div className="w-[600px] mx-auto">
+          {request.image ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"
+            >
+              <img
+                src={request.image}
+                alt={request.title}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="w-full aspect-video flex items-center justify-center text-gray-400 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border-2 border-dashed border-gray-300"
+            >
+              <div className="text-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-16 w-16 text-gray-400 mx-auto mb-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <p className="text-gray-500">No image provided</p>
+              </div>
+            </motion.div>
+          )}
+        </div>
+
 
         {/* Organizer Info */}
         <motion.div
@@ -272,10 +290,10 @@ const Page = () => {
             <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
               Requested by
             </span>
-            <p className="font-semibold text-gray-800 text-lg mt-2">{userName}</p>
-            <p className="text-sm text-gray-600 mt-1">
-              {userEmail}
+            <p className="font-semibold text-gray-800 text-lg mt-2">
+              {userName}
             </p>
+            <p className="text-sm text-gray-600 mt-1">{userEmail}</p>
           </div>
         </motion.div>
 
@@ -322,7 +340,9 @@ const Page = () => {
                   d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
                 />
               </svg>
-              <h2 className="text-lg font-semibold text-gray-800">Fundraising Progress</h2>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Fundraising Progress
+              </h2>
             </div>
 
             <div className="flex justify-between mb-2">
@@ -346,7 +366,8 @@ const Page = () => {
             <div className="flex justify-between text-sm text-gray-600">
               <span>{Math.round(progressPercentage)}% funded</span>
               <span>
-                {request.donationNumber || 0} donation{request.donationNumber !== 1 ? "s" : ""}
+                {request.donationNumber || 0} donation
+                {request.donationNumber !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -384,8 +405,8 @@ const Page = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className={`mb-4 p-3 rounded-lg ${donationStatus.success
-                      ? "bg-green-100 text-green-800 border border-green-200"
-                      : "bg-red-100 text-red-800 border border-red-200"
+                    ? "bg-green-100 text-green-800 border border-green-200"
+                    : "bg-red-100 text-red-800 border border-red-200"
                     }`}
                 >
                   {donationStatus.message}
@@ -396,6 +417,7 @@ const Page = () => {
                 <CheckoutForm
                   amount={donationAmount}
                   requestId={id}
+                  userId={userID}
                   onSuccess={handleDonationSuccess}
                   onError={handleDonationError}
                 />
@@ -421,8 +443,18 @@ const Page = () => {
                 className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
                 whileHover={{ scale: 1.01 }}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                  />
                 </svg>
                 Share
               </motion.button>
@@ -432,8 +464,18 @@ const Page = () => {
                 className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
                 whileHover={{ scale: 1.01 }}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
                 </svg>
                 Donate
               </motion.button>
@@ -445,8 +487,18 @@ const Page = () => {
                     className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
                     whileHover={{ scale: 1.01 }}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
                     </svg>
                     Edit
                   </motion.button>
@@ -456,8 +508,18 @@ const Page = () => {
                     className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
                     whileHover={{ scale: 1.01 }}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
                     </svg>
                     Delete
                   </motion.button>
@@ -483,7 +545,8 @@ const Page = () => {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              Created: {new Date(request.createdAt).toLocaleDateString("en-US", {
+              Created:{" "}
+              {new Date(request.createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
@@ -519,10 +582,10 @@ const Page = () => {
             {request?.trustAnalysis && (
               <div
                 className={`px-3 py-1 rounded-full text-white text-sm font-medium ${request.trustAnalysis.judgment === "Trustworthy"
-                    ? "bg-green-500"
-                    : request.trustAnalysis.judgment === "Needs Review"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
+                  ? "bg-green-500"
+                  : request.trustAnalysis.judgment === "Needs Review"
+                    ? "bg-yellow-500"
+                    : "bg-red-500"
                   }`}
               >
                 {request.trustAnalysis.judgment}
@@ -542,6 +605,72 @@ const Page = () => {
               <p className="text-gray-600">Analyzing this request...</p>
             </div>
           )}
+        </motion.div>
+
+        {/* Donors Section */}
+        <motion.div
+          className="mt-2 px-3 py-3 rounded-lg bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-100 shadow-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center mr-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+              Donors
+            </h2>
+          </div>
+
+          <div className="relative pl-4">
+            {request.donations && request.donations.length > 0 ? (
+              <div className="space-y-3">
+                {request.donations.map((donation, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between bg-white p-3 rounded-lg border border-emerald-100 shadow-sm"
+                  >
+                    <div className="flex items-center">
+                      <img
+                        src={
+                          donation.donor?.profilePicture ||
+                          "/placeholder-user.png"
+                        }
+                        alt="Donor"
+                        className="w-8 h-8 rounded-full border border-emerald-200 mr-3"
+                      />
+                      <span className="text-gray-800 font-medium">
+                        {donation.donor?.name || "Anonymous"}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-emerald-600 font-semibold">
+                        ₹{donation.amount?.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic pl-1">
+                No donors yet. Be the first to donate!
+              </p>
+            )}
+          </div>
         </motion.div>
       </div>
     </div>

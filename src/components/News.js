@@ -138,7 +138,7 @@ const News = () => {
           </div>
           <button
             onClick={() => router.push("/disaster-updates")}
-            className="py-2 px-4 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+            className="py-2 px-4 bg-cyan-600 text-white text-base rounded-lg hover:bg-cyan-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
           >
             All Updates
           </button>

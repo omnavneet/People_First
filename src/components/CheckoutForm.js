@@ -2,7 +2,7 @@
 import React, { useState } from "react"
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js"
 
-const CheckoutForm = ({ amount, requestId, onSuccess, onError }) => {
+const CheckoutForm = ({ amount, userId, requestId, onSuccess, onError }) => {
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
@@ -20,7 +20,8 @@ const CheckoutForm = ({ amount, requestId, onSuccess, onError }) => {
         method: "POST",
         body: JSON.stringify({
           amount: amount,
-          currency: "usd",
+          donorId: userId,
+          currency: "inr",
         }),
       })
 
@@ -55,6 +56,7 @@ const CheckoutForm = ({ amount, requestId, onSuccess, onError }) => {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 amount: parseFloat(amount),
+                donorId: userId,
               }),
             }
           )
@@ -112,9 +114,8 @@ const CheckoutForm = ({ amount, requestId, onSuccess, onError }) => {
       <button
         type="submit"
         disabled={!stripe || isLoading}
-        className={`w-full py-3 text-white rounded-lg transition-all ${
-          isLoading ? "bg-green-600" : "bg-green-700 hover:bg-green-800"
-        }`}
+        className={`w-full py-3 text-white rounded-lg transition-all ${isLoading ? "bg-green-600" : "bg-green-700 hover:bg-green-800"
+          }`}
       >
         {isLoading ? "Processing..." : `Donate ₹${amount}`}
       </button>
