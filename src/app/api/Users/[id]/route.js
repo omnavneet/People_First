@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import User from "../../../../../models/Users"
 import connectionDB from "../../../../libs/connectionDB"
 
+
 export async function GET(req, { params }) {
   await connectionDB()
 
@@ -9,8 +10,6 @@ export async function GET(req, { params }) {
 
   try {
     const user = await User.findById(id)
-
-    // Return 404 if user not found
     if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 })
 
@@ -31,7 +30,6 @@ export async function PUT(req, { params }) {
 
     const user = await User.findByIdAndUpdate(id, data, { new: true })
 
-    // Return 404 if user not found
     if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 })
 

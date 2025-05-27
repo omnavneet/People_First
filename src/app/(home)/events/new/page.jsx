@@ -14,7 +14,8 @@ const NewEventPage = () => {
   })
   const [imagePreview, setImagePreview] = useState(null)
   const [userId, setUserId] = useState(null)
-  const [error, setError] = useState(null)
+  const [errors, setErrors] = useState({})
+  const [generalError, setGeneralError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [showSuccessToast, setShowSuccessToast] = useState(false)
@@ -41,11 +42,11 @@ const NewEventPage = () => {
         if (data?._id) {
           setUserId(data._id)
         } else {
-          setError("User not authenticated")
+          setGeneralError("User not authenticated")
         }
       } catch (error) {
         console.log("Error fetching user:", error)
-        setError("Error fetching user")
+        setGeneralError("Error fetching user")
       } finally {
         setTimeout(() => {
           setIsLoading(false)
@@ -63,6 +64,14 @@ const NewEventPage = () => {
       ...prev,
       [name]: value,
     }))
+    // Clear field-specific error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
   }
 
   // Handle image upload
@@ -78,7 +87,14 @@ const NewEventPage = () => {
             ...prev,
             image: reader.result
           }))
-          setError(null)
+          // Clear image error
+          if (errors.image) {
+            setErrors(prev => {
+              const newErrors = { ...prev }
+              delete newErrors.image
+              return newErrors
+            })
+          }
         }
         reader.readAsDataURL(file)
       }, 600)
@@ -93,10 +109,17 @@ const NewEventPage = () => {
 
     try {
       InputSchema.parse(newEvent)
-      setError(null)
+      setErrors({})
+      setGeneralError(null)
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setError(error.errors)
+        const fieldErrors = {}
+        error.errors.forEach(err => {
+          if (err.path && err.path[0]) {
+            fieldErrors[err.path[0]] = err.message
+          }
+        })
+        setErrors(fieldErrors)
         return
       }
     }
@@ -124,7 +147,7 @@ const NewEventPage = () => {
         router.push(`/events`)
       }, 1500)
     } catch (error) {
-      setError(error.message || "Event creation failed")
+      setGeneralError(error.message || "Event creation failed")
       setIsSaving(false)
     }
   }
@@ -177,6 +200,12 @@ const NewEventPage = () => {
           Create New Event
         </h2>
 
+        {generalError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <p className="text-red-600">{generalError}</p>
+          </div>
+        )}
+
         {isLoading ? (
           <LoadingSkeleton />
         ) : (
@@ -196,10 +225,10 @@ const NewEventPage = () => {
                     className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-200"
                     placeholder="Enter event title"
                   />
+                  {errors.title && (
+                    <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                  )}
                 </div>
-                {error?.title && (
-                  <p className="text-red-500 text-sm mt-1">{error.title}</p>
-                )}
 
                 {/* Description */}
                 <div className="transform transition-all duration-200">
@@ -214,10 +243,10 @@ const NewEventPage = () => {
                     className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-200"
                     placeholder="Describe your event..."
                   />
+                  {errors.description && (
+                    <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                  )}
                 </div>
-                {error?.description && (
-                  <p className="text-red-500 text-sm mt-1">{error.description}</p>
-                )}
               </div>
 
               <div className="space-y-6">
@@ -236,8 +265,8 @@ const NewEventPage = () => {
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     </div>
                   </div>
-                  {typeof error === "string" && (
-                    <p className="text-red-500 text-sm mt-1">{error}</p>
+                  {errors.image && (
+                    <p className="text-red-500 text-sm mt-1">{errors.image}</p>
                   )}
                   {!imagePreview ? (
                     <div className="mt-4 flex justify-center items-center h-48 bg-gray-100 rounded-xl border border-gray-200">
@@ -254,9 +283,6 @@ const NewEventPage = () => {
                     </div>
                   )}
                 </div>
-                {error?.image && (
-                  <p className="text-red-500 text-sm mt-1">{error.image}</p>
-                )}
 
                 {/* Event Date */}
                 <div className="transform transition-all duration-200">
@@ -274,10 +300,10 @@ const NewEventPage = () => {
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     </div>
                   </div>
+                  {errors.eventDate && (
+                    <p className="text-red-500 text-sm mt-1">{errors.eventDate}</p>
+                  )}
                 </div>
-                {error?.eventDate && (
-                  <p className="text-red-500 text-sm mt-1">{error.eventDate}</p>
-                )}
               </div>
             </div>
 

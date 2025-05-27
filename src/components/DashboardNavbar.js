@@ -2,7 +2,7 @@
 import React from "react"
 import ForestIcon from "@mui/icons-material/Forest"
 import Link from "next/link"
-import { redirect, usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
@@ -15,25 +15,26 @@ const navItems = [
   { name: "Support & Info", href: "/support-info" },
 ]
 
-// Handle logout
-const handleLogout = () => {
-  const response = fetch("/api/auth/logout", {
-    method: "POST",
-  })
-    .then((response) => {
+const Sidebar = () => {
+  const pathname = usePathname()
+  const router = useRouter()
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      })
+
       if (response.ok) {
-        redirect("/sign-in")
+        router.push("/sign-in")
       } else {
         console.log("Logout failed")
       }
-    })
-    .catch((error) => {
+    } catch (error) {
       console.log("Error during logout:", error)
-    })
-}
-
-const Sidebar = () => {
-  const pathname = usePathname()
+    }
+  }
 
   return (
     <div className="h-screen w-64 mr-2 fixed left-0 top-0 bg-green-100 shadow-md flex flex-col">
@@ -58,11 +59,10 @@ const Sidebar = () => {
               <Link
                 key={index}
                 href={item.href}
-                className={`relative font-medium text-base py-3 px-4 rounded-lg ${
-                  isActive
+                className={`relative font-medium text-base py-3 px-4 rounded-lg ${isActive
                     ? "bg-green-600 text-white"
                     : "text-black hover:bg-green-200"
-                } transition-all duration-200`}
+                  } transition-all duration-200`}
               >
                 {item.name}
               </Link>
