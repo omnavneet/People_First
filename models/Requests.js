@@ -39,7 +39,7 @@ const RequestSchema = new mongoose.Schema(
     donors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
     donations: [DonationSchema],
     donationReceived: { type: Number, default: 0 },
-    image: { type: String, default: "" },
+    image: { type: String},
     trustAnalysis: {
       summary: { type: String },
       judgment: {

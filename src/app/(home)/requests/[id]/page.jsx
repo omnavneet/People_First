@@ -137,13 +137,12 @@ const Page = () => {
       setRequest(data)
       setRequestMakerID(data.user?._id)
 
-      // Set user information if available
+      // Set user information -->> if available
       if (data.user) {
         setUserName(data.user.name || "Anonymous")
         setUserEmail(data.user.email || "")
         setUserImage(data.user.profilePicture || "")
       }
-
     } catch (e) {
       console.error("Error fetching request:", e)
     } finally {
@@ -231,48 +230,23 @@ const Page = () => {
           <Status status={request.status} />
         </motion.div>
 
-        <div className="w-[600px] mx-auto">
-          {request.image ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"
-            >
-              <img
-                src={request.image}
-                alt={request.title}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="w-full aspect-video flex items-center justify-center text-gray-400 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border-2 border-dashed border-gray-300"
-            >
-              <div className="text-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 text-gray-400 mx-auto mb-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <p className="text-gray-500">No image provided</p>
-              </div>
-            </motion.div>
-          )}
-        </div>
-
+        {/* Image */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="w-80 mx-auto"
+        >
+          (
+          <div className="w-full h-60 bg-gray-100 rounded-xl overflow-hidden shadow-lg">
+            <img
+              src={request.image}
+              alt={request.title}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+          )
+        </motion.div>
 
         {/* Organizer Info */}
         <motion.div
@@ -404,10 +378,11 @@ const Page = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className={`mb-4 p-3 rounded-lg ${donationStatus.success
-                    ? "bg-green-100 text-green-800 border border-green-200"
-                    : "bg-red-100 text-red-800 border border-red-200"
-                    }`}
+                  className={`mb-4 p-3 rounded-lg ${
+                    donationStatus.success
+                      ? "bg-green-100 text-green-800 border border-green-200"
+                      : "bg-red-100 text-red-800 border border-red-200"
+                  }`}
                 >
                   {donationStatus.message}
                 </motion.div>
@@ -581,12 +556,13 @@ const Page = () => {
 
             {request?.trustAnalysis && (
               <div
-                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${request.trustAnalysis.judgment === "Trustworthy"
-                  ? "bg-green-500"
-                  : request.trustAnalysis.judgment === "Needs Review"
+                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                  request.trustAnalysis.judgment === "Trustworthy"
+                    ? "bg-green-500"
+                    : request.trustAnalysis.judgment === "Needs Review"
                     ? "bg-yellow-500"
                     : "bg-red-500"
-                  }`}
+                }`}
               >
                 {request.trustAnalysis.judgment}
               </div>

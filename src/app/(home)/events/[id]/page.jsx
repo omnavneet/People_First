@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
 const LoadingSkeleton = ({ className }) => (
-  <div className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] ${className}`}>
+  <div
+    className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] ${className}`}
+  >
     <div className="animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
   </div>
 )
@@ -15,17 +17,17 @@ const Status = ({ status }) => {
       case "completed":
         return {
           color: "bg-gradient-to-r from-green-500 to-emerald-600",
-          text: "COMPLETED"
+          text: "COMPLETED",
         }
       case "cancelled":
         return {
           color: "bg-gradient-to-r from-red-500 to-rose-600",
-          text: "CANCELLED"
+          text: "CANCELLED",
         }
       default:
         return {
           color: "bg-gradient-to-r from-blue-500 to-indigo-600",
-          text: "UPCOMING"
+          text: "UPCOMING",
         }
     }
   }
@@ -58,6 +60,7 @@ const EventDetailPage = () => {
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
 
+  // Share functionality
   const handleShare = async () => {
     try {
       await navigator.share({
@@ -70,6 +73,7 @@ const EventDetailPage = () => {
     }
   }
 
+  // Volunteer toggle
   const handleVolunteerToggle = async () => {
     console.log("Volunteer button clicked")
     if (!userID) return
@@ -78,14 +82,18 @@ const EventDetailPage = () => {
       const response = await fetch(`/api/Events/${id}/volunteer`, {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ userId: userID }),
       })
 
       if (response.ok) {
         const updatedEvent = await response.json()
-        setIsVolunteering(updatedEvent.volunteers.some(user => user._id === userID || user === userID))
+        setIsVolunteering(
+          updatedEvent.volunteers.some(
+            (user) => user._id === userID || user === userID
+          )
+        )
         setEvent(updatedEvent)
       }
     } catch (error) {
@@ -93,6 +101,7 @@ const EventDetailPage = () => {
     }
   }
 
+  // Post comment
   const handlePostComment = async (e) => {
     e.preventDefault()
     if (!userID || !comment.trim()) return
@@ -101,11 +110,11 @@ const EventDetailPage = () => {
       const response = await fetch(`/api/Events/${id}/comments`, {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: userID,
-          content: comment
+          content: comment,
         }),
       })
 
@@ -119,6 +128,7 @@ const EventDetailPage = () => {
     }
   }
 
+  // Fetch current user ID
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -132,25 +142,29 @@ const EventDetailPage = () => {
     fetchUser()
   }, [])
 
+  // Format event date
   useEffect(() => {
     if (event?.eventDate) {
       try {
-        const date = new Date(Number(event.eventDate));
-        setFormattedEventDate(date.toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }));
+        const date = new Date(Number(event.eventDate))
+        setFormattedEventDate(
+          date.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        )
       } catch (error) {
-        console.log("Error formatting date:", error);
-        setFormattedEventDate("Date format error");
+        console.log("Error formatting date:", error)
+        setFormattedEventDate("Date format error")
       }
     } else {
-      setFormattedEventDate("Date not available");
+      setFormattedEventDate("Date not available")
     }
-  }, [event]);
+  }, [event])
 
+  // Fetch event data
   const fetchEventData = async () => {
     if (!id) return
 
@@ -168,8 +182,8 @@ const EventDetailPage = () => {
       setComments(data.comments || [])
 
       if (userID && data.volunteers) {
-        const isUserVolunteering = data.volunteers.some(
-          user => (typeof user === 'object' ? user._id === userID : user === userID)
+        const isUserVolunteering = data.volunteers.some((user) =>
+          typeof user === "object" ? user._id === userID : user === userID
         )
         setIsVolunteering(isUserVolunteering)
       }
@@ -180,18 +194,21 @@ const EventDetailPage = () => {
     }
   }
 
+  // Fetch event data when userID changes or on initial load
   useEffect(() => {
     if (userID) {
       fetchEventData()
     }
   }, [id, userID])
 
+  // Fetch event data when the page loads without a userID
   useEffect(() => {
     if (!userID) {
       fetchEventData()
     }
   }, [id])
 
+  // Handle delete event
   const handleDelete = async () => {
     if (eventOrganizerID !== userID) {
       return
@@ -207,6 +224,7 @@ const EventDetailPage = () => {
     }
   }
 
+  // Fetch user name and email
   useEffect(() => {
     if (!eventOrganizerID) return
 
@@ -264,20 +282,43 @@ const EventDetailPage = () => {
           <Status status={event.status} />
         </motion.div>
 
-        {event.image && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"
-          >
-            <img
-              src={event.image}
-              alt={event.title}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-            />
-          </motion.div>
-        )}
+        {/* Image */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="w-80 mx-auto"
+        >
+          {event.image ? (
+            <div className="w-full h-60 bg-gray-100 rounded-xl overflow-hidden shadow-lg">
+              <img
+                src={event.image}
+                alt={event.title}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          ) : (
+            <div className="w-full h-60 flex items-center justify-center text-gray-400 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300">
+              <div className="text-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-12 w-12 text-gray-400 mx-auto mb-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <p className="text-gray-500 text-sm">No image provided</p>
+              </div>
+            </div>
+          )}
+        </motion.div>
 
         {/* Organizer Info */}
         <motion.div
@@ -295,10 +336,10 @@ const EventDetailPage = () => {
             <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
               Organized by
             </span>
-            <p className="font-semibold text-gray-800 text-lg mt-2">{userName}</p>
-            <p className="text-sm text-gray-600 mt-1">
-              {userEmail}
+            <p className="font-semibold text-gray-800 text-lg mt-2">
+              {userName}
             </p>
+            <p className="text-sm text-gray-600 mt-1">{userEmail}</p>
           </div>
         </motion.div>
 
@@ -313,9 +354,7 @@ const EventDetailPage = () => {
             Description
           </h2>
           <div className="prose prose-base max-w-none">
-            <p className="text-gray-700 leading-relaxed">
-              {event.description}
-            </p>
+            <p className="text-gray-700 leading-relaxed">{event.description}</p>
           </div>
         </motion.div>
 
@@ -362,12 +401,16 @@ const EventDetailPage = () => {
                 >
                   <div className="flex items-center mb-2">
                     <img
-                      src={comment.user?.profilePicture || "/placeholder-user.png"}
+                      src={
+                        comment.user?.profilePicture || "/placeholder-user.png"
+                      }
                       alt="User"
                       className="w-10 h-10 rounded-full mr-3 border border-gray-300"
                     />
                     <div>
-                      <p className="font-medium text-gray-900">{comment.user?.name}</p>
+                      <p className="font-medium text-gray-900">
+                        {comment.user?.name}
+                      </p>
                       <p className="text-xs text-gray-500">
                         {new Date(comment.createdAt).toLocaleString()}
                       </p>
@@ -377,7 +420,9 @@ const EventDetailPage = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 italic">No comments yet. Be the first to comment!</p>
+              <p className="text-gray-500 italic">
+                No comments yet. Be the first to comment!
+              </p>
             )}
           </div>
         </motion.div>
@@ -410,7 +455,8 @@ const EventDetailPage = () => {
                   />
                 </svg>
                 <span className="text-gray-700">
-                  Created: {new Date(event.createdAt).toLocaleDateString("en-US", {
+                  Created:{" "}
+                  {new Date(event.createdAt).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
@@ -434,7 +480,9 @@ const EventDetailPage = () => {
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span className="text-gray-700">{event.volunteers?.length || 0} volunteers</span>
+              <span className="text-gray-700">
+                {event.volunteers?.length || 0} volunteers
+              </span>
             </div>
           </div>
 
@@ -451,8 +499,18 @@ const EventDetailPage = () => {
               className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
               whileHover={{ scale: 1.01 }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                />
               </svg>
               Share
             </motion.button>
@@ -461,23 +519,44 @@ const EventDetailPage = () => {
             <motion.button
               onClick={handleVolunteerToggle}
               disabled={!userID}
-              className={`flex items-center justify-center gap-2 font-medium px-4 py-2 rounded-md shadow-sm transition text-white ${isVolunteering
-                ? "bg-yellow-600 hover:bg-yellow-700"
-                : "bg-indigo-600 hover:bg-indigo-700"
-                } ${!userID && "opacity-50 cursor-not-allowed"}`}
+              className={`flex items-center justify-center gap-2 font-medium px-4 py-2 rounded-md shadow-sm transition text-white ${
+                isVolunteering
+                  ? "bg-yellow-600 hover:bg-yellow-700"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+              } ${!userID && "opacity-50 cursor-not-allowed"}`}
               whileHover={{ scale: 1.01 }}
             >
               {isVolunteering ? (
                 <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                   Unvolunteer
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
                   </svg>
                   Volunteer
                 </>
@@ -492,8 +571,18 @@ const EventDetailPage = () => {
                   className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
                   whileHover={{ scale: 1.01 }}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
                   </svg>
                   Edit
                 </motion.button>
@@ -503,8 +592,18 @@ const EventDetailPage = () => {
                   className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition"
                   whileHover={{ scale: 1.01 }}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                   Delete
                 </motion.button>
@@ -543,9 +642,7 @@ const EventDetailPage = () => {
           </div>
 
           <div className="relative pl-4 border-l-2 border-purple-200">
-            <p className="text-gray-800 text-lg">
-              {formattedEventDate}
-            </p>
+            <p className="text-gray-800 text-lg">{formattedEventDate}</p>
           </div>
         </motion.div>
 
@@ -575,12 +672,13 @@ const EventDetailPage = () => {
 
             {event?.eventAnalysis && (
               <div
-                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${event.eventAnalysis.judgment === "Trustworthy"
-                  ? "bg-green-500"
-                  : event.eventAnalysis.judgment === "Needs Review"
+                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                  event.eventAnalysis.judgment === "Trustworthy"
+                    ? "bg-green-500"
+                    : event.eventAnalysis.judgment === "Needs Review"
                     ? "bg-yellow-500"
                     : "bg-red-500"
-                  }`}
+                }`}
               >
                 {event.eventAnalysis.judgment}
               </div>
@@ -638,7 +736,9 @@ const EventDetailPage = () => {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500 italic pl-1">No volunteers yet. Be the first to volunteer!</p>
+              <p className="text-gray-500 italic pl-1">
+                No volunteers yet. Be the first to volunteer!
+              </p>
             )}
           </div>
         </motion.div>

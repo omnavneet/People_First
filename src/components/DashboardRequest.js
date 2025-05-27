@@ -34,13 +34,7 @@ const DashboardRequest = () => {
     fetchRequests()
   }, [])
 
-  // Calculate donation progress percentage
-  const getProgressPercentage = (received, goal) => {
-    const percentage = (received / goal) * 100
-    return Math.min(percentage, 100) // Cap at 100%
-  }
 
-  // Set status based on donation received and goal
   const calculateStatus = (received, goal) => {
     if (received >= goal) return "fulfilled"
     if (received < goal && received > 0) return "active"
@@ -58,14 +52,6 @@ const DashboardRequest = () => {
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Support Requests</h2>
-          <motion.button
-            onClick={() => router.push("/requests/new")}
-            className="py-2 px-4 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span>New Request</span>
-          </motion.button>
         </div>
 
         {requestloading ? (

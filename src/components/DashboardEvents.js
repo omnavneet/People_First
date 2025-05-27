@@ -44,14 +44,6 @@ const DashboardEvents = () => {
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Community Events</h2>
-          <motion.button
-            onClick={() => router.push("/events/new")}
-            className="py-2 px-4 bg-pink-600 text-white text-base rounded-lg hover:bg-pink-700 transition-all shadow-md hover:shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span>New Event</span>
-          </motion.button>
         </div>
 
         {eventloading ? (

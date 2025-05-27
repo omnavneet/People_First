@@ -7,7 +7,7 @@ const Page = () => {
   const [newRequest, setNewRequest] = useState({
     title: "",
     description: "",
-    donationGoal: 1000,
+    donationGoal: 10000,
     image: "",
     status: "active",
   })
@@ -23,7 +23,7 @@ const Page = () => {
     title: z.string().min(5).max(100),
     description: z.string().min(20),
     donationGoal: z.number().positive(),
-    image: z.string(),
+    image: z.string().min(1),
   })
 
   useEffect(() => {
@@ -38,16 +38,16 @@ const Page = () => {
         if (data._id) {
           setUserId(data._id)
         } else {
-          console.error("User not found or not authenticated")
+          console.log("User not found or not authenticated")
           setError("User not found or not authenticated")
         }
       } catch (error) {
-        console.error("Error fetching user:", error)
+        console.log("Error fetching user:", error)
         setError("Error fetching user data")
       } finally {
         setTimeout(() => {
           setIsLoading(false)
-        }, 800) 
+        }, 800)
       }
     }
 
@@ -72,7 +72,7 @@ const Page = () => {
           setImagePreview(reader.result)
           setNewRequest((prev) => ({
             ...prev,
-            image: reader.result
+            image: reader.result,
           }))
           setError(null)
         }
@@ -95,7 +95,7 @@ const Page = () => {
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError(error.errors)
-        console.error("Validation error:", error.errors)
+        console.log("Validation error:", error.errors)
         return
       }
     }
@@ -117,21 +117,19 @@ const Page = () => {
         throw new Error(`Request creation failed: ${errorText}`)
       }
 
-      // Show success toast
       setShowSuccessToast(true)
 
-      // Delay navigation for better UX
       setTimeout(() => {
         router.push(`/requests`)
       }, 1500)
     } catch (error) {
-      console.error("Error creating request:", error)
+      console.log("Error creating request:", error)
       setError(error.message)
       setIsSaving(false)
     }
   }
 
-  // Loading skeleton UI component
+  // Loading skeleton
   const LoadingSkeleton = () => (
     <div className="animate-pulse">
       <div className="h-10 bg-gray-200 rounded-xl mb-8"></div>
@@ -184,28 +182,30 @@ const Page = () => {
                 {/* Title */}
                 <div className="transform transition-all duration-200">
                   <label className="block text-gray-700 font-semibold mb-2">
-                    Title<span className="text-green-500">*</span>
+                    Title<span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="title"
                     value={newRequest.title}
                     onChange={handleInputChange}
-                    className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-300 transition-all duration-200"
+                    className="w-full p-3.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-red-300 focus:border-red-300 transition-all duration-200"
                     placeholder="Enter a title"
                     required
                   />
-                  {error && error.some && error.some((e) => e.path[0] === "title") && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {error.find((e) => e.path[0] === "title")?.message}
-                    </p>
-                  )}
+                  {error &&
+                    error.some &&
+                    error.some((e) => e.path[0] === "title") && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {error.find((e) => e.path[0] === "title")?.message}
+                      </p>
+                    )}
                 </div>
 
                 {/* Description */}
                 <div className="transform transition-all duration-200">
                   <label className="block text-gray-700 font-semibold mb-2">
-                    Description<span className="text-green-500">*</span>
+                    Description<span className="text-red-500">*</span>
                   </label>
                   <textarea
                     name="description"
@@ -216,20 +216,24 @@ const Page = () => {
                     placeholder="Describe your request in detail..."
                     required
                   />
-                  {error && error.some && error.some((e) => e.path[0] === "description") && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {error.find((e) => e.path[0] === "description")?.message}
-                    </p>
-                  )}
+                  {error &&
+                    error.some &&
+                    error.some((e) => e.path[0] === "description") && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {
+                          error.find((e) => e.path[0] === "description")
+                            ?.message
+                        }
+                      </p>
+                    )}
                 </div>
               </div>
-
 
               <div className="space-y-6">
                 {/* Donation */}
                 <div className="transform transition-all duration-200">
                   <label className="block text-gray-700 font-semibold mb-2">
-                    Donation Goal (₹)<span className="text-green-500">*</span>
+                    Donation Goal (₹)<span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -245,18 +249,23 @@ const Page = () => {
                       placeholder="1000"
                       required
                     />
-                    {error && error.some && error.some((e) => e.path[0] === "donationGoal") && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {error.find((e) => e.path[0] === "donationGoal")?.message}
-                      </p>
-                    )}
+                    {error &&
+                      error.some &&
+                      error.some((e) => e.path[0] === "donationGoal") && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {
+                            error.find((e) => e.path[0] === "donationGoal")
+                              ?.message
+                          }
+                        </p>
+                      )}
                   </div>
                 </div>
 
                 {/* Image Upload */}
                 <div className="transform transition-all duration-200">
                   <label className="block text-gray-700 font-semibold mb-2">
-                    Request Image
+                    Request Image <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -265,12 +274,15 @@ const Page = () => {
                       onChange={handleImageUpload}
                       className="w-full p-3.5 border border-dashed border-green-300 bg-green-50 rounded-xl shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-300 transition-all duration-200"
                     />
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    </div>
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"></div>
                   </div>
-                  {typeof error === "string" && (
-                    <p className="text-red-500 text-sm mt-1">{error}</p>
-                  )}
+                  {error &&
+                    error.some &&
+                    error.some((e) => e.path[0] === "image") && (
+                      <p className="text-red-500 text-sm mt-1">
+                        Image cannot be empty
+                      </p>
+                    )}
 
                   {/* Image Preview */}
                   {!imagePreview ? (
@@ -301,14 +313,32 @@ const Page = () => {
               <button
                 onClick={handleNewRequest}
                 disabled={isSaving}
-                className={`flex-1 px-6 py-4 ${isSaving ? 'bg-green-400' : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+                className={`flex-1 px-6 py-4 ${isSaving
+                    ? "bg-green-400"
+                    : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                   } text-white rounded-xl transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-300`}
               >
                 {isSaving ? (
                   <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Creating Request...
                   </div>
