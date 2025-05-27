@@ -10,6 +10,7 @@ const EventsPage = () => {
   const [currentUser, setCurrentUser] = useState(null)
   const router = useRouter()
 
+  // Fetch current user and events on component mount
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -20,7 +21,6 @@ const EventsPage = () => {
       }
     }
 
-    // Fetch all events
     const fetchEvents = async () => {
       setIsLoading(true)
       try {
@@ -43,6 +43,7 @@ const EventsPage = () => {
     fetchEvents()
   }, [])
 
+  // Function to fetch current user
   const getCurrentUser = () => {
     return fetch("/api/Users/current", {
       method: "GET",
@@ -62,7 +63,7 @@ const EventsPage = () => {
     return false
   })
 
-  // Get appropriate status styling
+  // Get status
   const getStatusStyle = (status) => {
     switch (status) {
       case "upcoming":

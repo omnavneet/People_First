@@ -21,6 +21,7 @@ const SignUp = () => {
     profilePicture: z.instanceof(File).optional(),
   })
 
+  // Handle file input change
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -33,6 +34,7 @@ const SignUp = () => {
     }
   }
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
@@ -260,30 +262,6 @@ const SignUp = () => {
               Sign In
             </motion.button>
           </p>
-        </motion.div>
-
-        <motion.div
-          className="mt-8 pt-6 border-t border-gray-200"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-        >
-          <div className="grid grid-cols-2 gap-3">
-            <motion.button
-              className="p-3 bg-gray-50 rounded-xl text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors flex items-center justify-center"
-              whileHover={{ scale: 1.05, backgroundColor: "#f3f4f6" }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Visit Homepage
-            </motion.button>
-            <motion.button
-              className="p-3 bg-purple-50 rounded-xl text-purple-700 text-sm font-medium hover:bg-purple-100 transition-colors flex items-center justify-center"
-              whileHover={{ scale: 1.05, backgroundColor: "#f3e8ff" }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Contact Support
-            </motion.button>
-          </div>
         </motion.div>
       </motion.div>
     </div>

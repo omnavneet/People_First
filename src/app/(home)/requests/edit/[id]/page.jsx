@@ -47,7 +47,7 @@ const EditRequestPage = () => {
           setError("User not authenticated")
         }
       } catch (error) {
-        console.error("Error fetching user:", error)
+        console.log("Error fetching user:", error)
         setError("Error fetching user")
       }
     }
@@ -76,7 +76,7 @@ const EditRequestPage = () => {
           setIsLoading(false)
         }, 800)
       } catch (e) {
-        console.error("Error fetching request data:", e)
+        console.log("Error fetching request data:", e)
         setError("Failed to load request details.")
         setIsLoading(false)
       }
@@ -112,7 +112,7 @@ const EditRequestPage = () => {
           setError(null)
         }
         reader.readAsDataURL(file)
-      }, 600) // Short delay
+      }, 600)
 
       return () => clearTimeout(loadingTimeout)
     }

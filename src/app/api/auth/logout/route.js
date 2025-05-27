@@ -11,5 +11,6 @@ export async function POST(req) {
     expires: new Date(0),
   })
 
+  // Redirect to sign-in page after logout
   return NextResponse.redirect(new URL("/sign-in", req.url))
 }

@@ -28,6 +28,7 @@ const NewEventPage = () => {
     eventDate: z.string().nonempty("Date is required"),
   })
 
+  // Fetch current user on mount
   useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true)
@@ -43,18 +44,19 @@ const NewEventPage = () => {
           setError("User not authenticated")
         }
       } catch (error) {
-        console.error("Error fetching user:", error)
+        console.log("Error fetching user:", error)
         setError("Error fetching user")
       } finally {
         setTimeout(() => {
           setIsLoading(false)
-        }, 800) // Add slight delay for smoother loading transition
+        }, 800)
       }
     }
 
     fetchUser()
   }, [])
 
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setNewEvent((prev) => ({
@@ -63,6 +65,7 @@ const NewEventPage = () => {
     }))
   }
 
+  // Handle image upload
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -78,12 +81,13 @@ const NewEventPage = () => {
           setError(null)
         }
         reader.readAsDataURL(file)
-      }, 600) // Short delay
+      }, 600)
 
       return () => clearTimeout(loadingTimeout)
     }
   }
 
+  // Handle new event creation
   const handleNewEvent = async () => {
     if (!userId) return
 
@@ -114,10 +118,8 @@ const NewEventPage = () => {
         throw new Error(errorText)
       }
 
-      // Show success toast
       setShowSuccessToast(true)
 
-      // Delay navigation for better UX
       setTimeout(() => {
         router.push(`/events`)
       }, 1500)
@@ -127,7 +129,7 @@ const NewEventPage = () => {
     }
   }
 
-  // Loading skeleton UI component
+  // Loading skeleton
   const LoadingSkeleton = () => (
     <div className="animate-pulse">
       <div className="h-10 bg-gray-200 rounded-xl mb-8"></div>
@@ -195,6 +197,9 @@ const NewEventPage = () => {
                     placeholder="Enter event title"
                   />
                 </div>
+                {error?.title && (
+                  <p className="text-red-500 text-sm mt-1">{error.title}</p>
+                )}
 
                 {/* Description */}
                 <div className="transform transition-all duration-200">
@@ -210,6 +215,9 @@ const NewEventPage = () => {
                     placeholder="Describe your event..."
                   />
                 </div>
+                {error?.description && (
+                  <p className="text-red-500 text-sm mt-1">{error.description}</p>
+                )}
               </div>
 
               <div className="space-y-6">
@@ -246,6 +254,9 @@ const NewEventPage = () => {
                     </div>
                   )}
                 </div>
+                {error?.image && (
+                  <p className="text-red-500 text-sm mt-1">{error.image}</p>
+                )}
 
                 {/* Event Date */}
                 <div className="transform transition-all duration-200">
@@ -264,6 +275,9 @@ const NewEventPage = () => {
                     </div>
                   </div>
                 </div>
+                {error?.eventDate && (
+                  <p className="text-red-500 text-sm mt-1">{error.eventDate}</p>
+                )}
               </div>
             </div>
 

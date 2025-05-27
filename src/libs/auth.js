@@ -13,11 +13,11 @@ export const createJWT = (user) => {
   const token = jwt.sign(
     {
       _id: user._id,
-      userName: user.userName,
+      userName: user.name,
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: "24h",
+      expiresIn: "7d",
     }
   )
   return token

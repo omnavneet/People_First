@@ -31,6 +31,7 @@ const EditEventPage = () => {
     eventDate: z.string().nonempty("Date is required"),
   })
 
+  // Fetch current user ID on component mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -45,7 +46,7 @@ const EditEventPage = () => {
           setError("User not authenticated")
         }
       } catch (error) {
-        console.error("Error fetching user:", error)
+        console.log("Error fetching user:", error)
         setError("Error fetching user")
       }
     }
@@ -53,6 +54,8 @@ const EditEventPage = () => {
     fetchUser()
   }, [])
 
+
+  // Fetch event data when ID is available
   useEffect(() => {
     const fetchEvent = async () => {
       setIsLoading(true)
@@ -70,9 +73,9 @@ const EditEventPage = () => {
           })
           setImagePreview(data.image)
           setIsLoading(false)
-        }, 800) // Add slight delay for smoother loading transition
+        }, 800)
       } catch (e) {
-        console.error("Error fetching event data:", e)
+        console.log("Error fetching event data:", e)
         setError("Failed to load event details.")
         setIsLoading(false)
       }
@@ -81,6 +84,7 @@ const EditEventPage = () => {
     if (id) fetchEvent()
   }, [id])
 
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setNewEvent((prev) => ({
@@ -89,6 +93,7 @@ const EditEventPage = () => {
     }))
   }
 
+  // Handle image upload with a short delay
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -104,12 +109,13 @@ const EditEventPage = () => {
           setError(null)
         }
         reader.readAsDataURL(file)
-      }, 600) // Short delay
+      }, 600)
 
       return () => clearTimeout(loadingTimeout)
     }
   }
 
+  // Handle event update
   const handleUpdateEvent = async () => {
     if (!userId) return
 
@@ -140,10 +146,8 @@ const EditEventPage = () => {
         throw new Error(errorText)
       }
 
-      // Show success toast
       setShowSuccessToast(true)
 
-      // Delay navigation for better UX
       setTimeout(() => {
         router.push(`/events/${id}`)
       }, 1500)
@@ -153,7 +157,7 @@ const EditEventPage = () => {
     }
   }
 
-  // Loading skeleton UI component
+  // Loading skeleton
   const LoadingSkeleton = () => (
     <div className="animate-pulse">
       <div className="h-10 bg-gray-200 rounded-xl mb-8"></div>
@@ -333,11 +337,10 @@ const EditEventPage = () => {
               <button
                 onClick={handleUpdateEvent}
                 disabled={isSaving}
-                className={`flex-1 px-6 py-4 ${
-                  isSaving
-                    ? "bg-pink-400"
-                    : "bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
-                } text-white rounded-xl transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-300`}
+                className={`flex-1 px-6 py-4 ${isSaving
+                  ? "bg-pink-400"
+                  : "bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
+                  } text-white rounded-xl transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-300`}
               >
                 {isSaving ? (
                   <div className="flex items-center justify-center">

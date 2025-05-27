@@ -8,6 +8,7 @@ const DashboardRequest = () => {
   const [requestloading, setRequestLoading] = useState(true)
   const router = useRouter()
 
+  // Fetch recent support requests
   useEffect(() => {
     const fetchRequests = async () => {
       setRequestLoading(true)

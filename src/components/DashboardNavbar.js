@@ -15,6 +15,7 @@ const navItems = [
   { name: "Support & Info", href: "/support-info" },
 ]
 
+// Handle logout
 const handleLogout = () => {
   const response = fetch("/api/auth/logout", {
     method: "POST",
@@ -23,7 +24,7 @@ const handleLogout = () => {
       if (response.ok) {
         redirect("/sign-in")
       } else {
-        console.error("Logout failed")
+        console.log("Logout failed")
       }
     })
     .catch((error) => {

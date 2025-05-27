@@ -61,11 +61,10 @@ const ChecklistItem = ({ item, checked, onToggle }) => (
   <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
     <button
       onClick={onToggle}
-      className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 flex-shrink-0 transition-colors ${
-        checked
+      className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 flex-shrink-0 transition-colors ${checked
           ? "bg-green-500 border-green-500 text-white"
           : "border-gray-300 hover:border-green-400"
-      }`}
+        }`}
     >
       {checked && (
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -78,9 +77,8 @@ const ChecklistItem = ({ item, checked, onToggle }) => (
       )}
     </button>
     <span
-      className={`text-sm leading-relaxed ${
-        checked ? "text-gray-500 line-through" : "text-gray-700"
-      }`}
+      className={`text-sm leading-relaxed ${checked ? "text-gray-500 line-through" : "text-gray-700"
+        }`}
     >
       {item}
     </span>

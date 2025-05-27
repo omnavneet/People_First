@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 export async function POST(req) {
   try {
     const { amount, currency = "usd" } = await req.json()
-  
+
     const amountInCents = Math.round(parseFloat(amount) * 100)
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -16,13 +16,13 @@ export async function POST(req) {
     })
 
     return NextResponse.json(
-      { clientSecret: paymentIntent.client_secret }, 
+      { clientSecret: paymentIntent.client_secret },
       { status: 200 }
     )
   } catch (error) {
-    console.error("Payment error:", error)
+    console.log("Payment error:", error)
     return NextResponse.json(
-      { error: error.message }, 
+      { error: error.message },
       { status: 500 }
     )
   }

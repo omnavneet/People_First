@@ -21,7 +21,7 @@ const CheckoutForm = ({ amount, userId, requestId, onSuccess, onError }) => {
         body: JSON.stringify({
           amount: amount,
           donorId: userId,
-          currency: "inr",
+          currency: "usd",
         }),
       })
 
@@ -69,7 +69,7 @@ const CheckoutForm = ({ amount, userId, requestId, onSuccess, onError }) => {
           onSuccess(paymentIntent)
         } catch (updateError) {
           console.error("Error updating donation:", updateError)
-          // Still consider the payment successful even if the update fails
+          // Still consider the payment successful
           onSuccess(paymentIntent)
         }
       }

@@ -6,6 +6,7 @@ import { loadStripe } from "@stripe/stripe-js"
 import { Elements } from "@stripe/react-stripe-js"
 import CheckoutForm from "../../../../components/CheckoutForm"
 
+
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 const LoadingSkeleton = ({ className }) => (
@@ -16,6 +17,7 @@ const LoadingSkeleton = ({ className }) => (
   </div>
 )
 
+// Status component
 const Status = ({ status }) => {
   const getStatusConfig = (status) => {
     switch (status?.toLowerCase()) {
@@ -78,6 +80,7 @@ const Page = () => {
     }
   }
 
+  // Handle donation button click
   const handleDonateClick = () => {
     setShowDonationForm(true)
     setDonationAmount(
@@ -87,6 +90,7 @@ const Page = () => {
     )
   }
 
+  // Handle donation success and error
   const handleDonationSuccess = async (paymentIntent) => {
     setDonationStatus({
       success: true,
@@ -99,6 +103,8 @@ const Page = () => {
     }, 3000)
   }
 
+
+  // Handle donation error
   const handleDonationError = (errorMessage) => {
     setDonationStatus({
       success: false,
@@ -106,6 +112,7 @@ const Page = () => {
     })
   }
 
+  // Fetch current user ID
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -113,12 +120,14 @@ const Page = () => {
         const data = await response.json()
         setUserID(data._id)
       } catch (e) {
-        console.error("Error fetching user:", e)
+        console.log("Error fetching user:", e)
       }
     }
     fetchUser()
   }, [])
 
+
+  // Fetch request data
   const fetchRequestData = async () => {
     if (!id) return
 
@@ -144,16 +153,18 @@ const Page = () => {
         setUserImage(data.user.profilePicture || "")
       }
     } catch (e) {
-      console.error("Error fetching request:", e)
+      console.log("Error fetching request:", e)
     } finally {
       setLoading(false)
     }
   }
 
+  // Fetch request data on component mount and when ID changes
   useEffect(() => {
     fetchRequestData()
   }, [id])
 
+  // Handle delete request
   const handleDelete = async () => {
     if (requestMakerID !== userID) {
       return
@@ -165,10 +176,11 @@ const Page = () => {
       })
       router.push("/requests")
     } catch (e) {
-      console.error("Error deleting request:", e)
+      console.log("Error deleting request:", e)
     }
   }
 
+  // Fetch user name and email based on request maker ID
   useEffect(() => {
     if (!requestMakerID) return
 
@@ -182,13 +194,14 @@ const Page = () => {
         setUserEmail(data.email)
         setUserImage(data.profilePicture)
       } catch (e) {
-        console.error("Error fetching user name:", e)
+        console.log("Error fetching user name:", e)
       }
     }
 
     fetchUserName()
   }, [requestMakerID])
 
+  // Calculate progress percentage
   const progressPercentage = request.donationGoal
     ? Math.min(100, (request.donationReceived / request.donationGoal) * 100)
     : 0
@@ -237,7 +250,6 @@ const Page = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="w-80 mx-auto"
         >
-          (
           <div className="w-full h-60 bg-gray-100 rounded-xl overflow-hidden shadow-lg">
             <img
               src={request.image}
@@ -245,7 +257,6 @@ const Page = () => {
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
-          )
         </motion.div>
 
         {/* Organizer Info */}
@@ -378,11 +389,10 @@ const Page = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className={`mb-4 p-3 rounded-lg ${
-                    donationStatus.success
+                  className={`mb-4 p-3 rounded-lg ${donationStatus.success
                       ? "bg-green-100 text-green-800 border border-green-200"
                       : "bg-red-100 text-red-800 border border-red-200"
-                  }`}
+                    }`}
                 >
                   {donationStatus.message}
                 </motion.div>
@@ -556,13 +566,12 @@ const Page = () => {
 
             {request?.trustAnalysis && (
               <div
-                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                  request.trustAnalysis.judgment === "Trustworthy"
+                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${request.trustAnalysis.judgment === "Trustworthy"
                     ? "bg-green-500"
                     : request.trustAnalysis.judgment === "Needs Review"
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
-                }`}
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }`}
               >
                 {request.trustAnalysis.judgment}
               </div>

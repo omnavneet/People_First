@@ -4,13 +4,12 @@ import connectionDB from "../../../../../libs/connectionDB"
 import mongoose from "mongoose"
 
 export async function POST(req, { params }) {
-  await connectionDB()
-  const { id } = params
-
   try {
+    await connectionDB()
+    
+    const { id } = params
     const { amount, donorId, paymentIntentId } = await req.json()
 
-    // Basic validation
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: "Invalid donation amount" }, { status: 400 })
     }
@@ -36,14 +35,14 @@ export async function POST(req, { params }) {
           donationReceived: amount,
         },
         $push: { donations: newDonation },
-        $addToSet: { donors: donorObjectId }, // Use ObjectId here too
+        $addToSet: { donors: donorObjectId },
       },
       { new: true }
     )
 
     return NextResponse.json(updatedRequest)
   } catch (error) {
-    console.log("Error updating donation:", error)
+    console.log("Error processing donation:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

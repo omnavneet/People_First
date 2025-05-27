@@ -2,9 +2,9 @@ import { NextResponse } from "next/server"
 import Events from "../../../../../../models/Events"
 import connectionDB from "../../../../../libs/connectionDB"
 
-// Toggle volunteer status
 export async function POST(req, { params }) {
   await connectionDB()
+  
   const { id } = params
 
   try {
@@ -12,10 +12,10 @@ export async function POST(req, { params }) {
 
     const event = await Events.findById(id)
 
+    // Return 404 if event not found
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 })
-    }
-
+    }    // Check if user is already a volunteer
     const volunteerIndex = event.volunteers?.findIndex(
       (volunteerId) => volunteerId.toString() === userId
     )
@@ -36,8 +36,7 @@ export async function POST(req, { params }) {
     await event.populate("comments.user", "name profilePicture")
 
     return NextResponse.json(event)
-  } catch (error) {
-    console.error("Volunteer toggle error:", error)
+  } catch (error) {    console.log("Volunteer toggle error:", error)
     return NextResponse.json(
       { error: "Failed to toggle volunteer status" },
       { status: 500 }

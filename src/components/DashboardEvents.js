@@ -8,6 +8,7 @@ const DashboardEvents = () => {
   const [eventloading, setEventLoading] = useState(true)
   const router = useRouter()
 
+  // Fetch recent community events
   useEffect(() => {
     const fetchEvents = async () => {
       setEventLoading(true)

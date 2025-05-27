@@ -26,6 +26,7 @@ const Page = () => {
     image: z.string().min(1),
   })
 
+  // Fetch current user ID
   useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true)
@@ -54,6 +55,7 @@ const Page = () => {
     fetchUser()
   }, [])
 
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setNewRequest((prev) => ({
@@ -62,6 +64,7 @@ const Page = () => {
     }))
   }
 
+  // Handle image upload  
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -77,12 +80,13 @@ const Page = () => {
           setError(null)
         }
         reader.readAsDataURL(file)
-      }, 600) // Short delay
+      }, 600)
 
       return () => clearTimeout(loadingTimeout)
     }
   }
 
+  // Handle new request submission
   const handleNewRequest = async () => {
     if (!userId) return
 

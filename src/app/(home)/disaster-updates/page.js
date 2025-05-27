@@ -90,7 +90,7 @@ const News = () => {
         const data = await res.json()
         setArticles(data || [])
       } catch (err) {
-        console.error("Failed to fetch news:", err)
+        console.log("Failed to fetch news:", err)
         setError("Failed to load news. Please try again later.")
       } finally {
         setLoading(false)

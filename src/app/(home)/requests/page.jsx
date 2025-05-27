@@ -44,6 +44,7 @@ const Page = () => {
     fetchRequests()
   }, [])
 
+  // Function to fetch current user
   const getCurrentUser = () => {
     return fetch("/api/Users/current", {
       method: "GET",
@@ -55,6 +56,7 @@ const Page = () => {
       })
   }
 
+  // Filter requests
   const filteredRequests = requests.filter((request) => {
     if (currentView === "all") return true
     if (currentView === "your" && currentUser) {
