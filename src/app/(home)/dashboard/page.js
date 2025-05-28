@@ -39,7 +39,7 @@ const Home = () => {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
       <div className="flex flex-col py-8 px-4 sm:px-6 md:px-8 lg:px-12 max-w-8xl mx-auto">
         <motion.header
-          className="text-center mb-12"
+          className="text-center mb-5"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -54,31 +54,21 @@ const Home = () => {
               <span className="text-gray-800">{user?.name}</span>
             )}
           </h1>
-
-          <motion.p
-            className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-          >
-            Your compassion creates ripples of positive change. Here's the
-            impact you're making in your community.
-          </motion.p>
         </motion.header>
 
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-3"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.6 }}
         >
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 min-h-screen">
             <DashboardEvents />
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 min-h-screen">
             <DashboardRequest />
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 min-h-screen">
             <News />
           </div>
         </motion.div>

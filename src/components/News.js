@@ -109,7 +109,7 @@ const News = () => {
 
   return (
     <motion.div
-      className="bg-white rounded-2xl shadow-lg p-6 h-fit"
+      className="bg-white rounded-2xl shadow-lg p-6"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
@@ -146,7 +146,7 @@ const News = () => {
         </div>
       </div>
 
-      <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <div className="max-h-[calc(100vh-18rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         {loading ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (

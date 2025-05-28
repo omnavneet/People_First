@@ -3,13 +3,13 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { motion } from "framer-motion"
+import Link from "next/link"
+import ForestIcon from "@mui/icons-material/Forest"
 
 const SignUp = () => {
   const [userName, setUserName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [profilePicture, setProfilePicture] = useState("")
-  const [profilePreview, setProfilePreview] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -18,21 +18,7 @@ const SignUp = () => {
     userName: z.string().min(3, "Username must be at least 3 characters"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    profilePicture: z.instanceof(File).optional(),
   })
-
-  // Handle file input change
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setProfilePicture(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setProfilePreview(reader.result)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -44,7 +30,6 @@ const SignUp = () => {
       userName,
       email,
       password,
-      profilePicture,
     })
 
     if (!result.success) {
@@ -58,9 +43,6 @@ const SignUp = () => {
     formData.append("userName", userName)
     formData.append("email", email)
     formData.append("password", password)
-    if (profilePicture) {
-      formData.append("profilePicture", profilePicture)
-    }
 
     try {
       const res = await fetch("/api/auth/signup", {
@@ -94,21 +76,32 @@ const SignUp = () => {
   }
 
   return (
-    <div className="flex flex-col py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-green-50 min-h-screen items-center justify-center">
+    <div className="flex flex-col py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-green-700/10 min-h-screen items-center justify-center">
+      <div className="absolute top-10 left-16">
+        <Link href="/" className="flex items-center space-x-2 group">
+          <div className="p-2 rounded-full bg-green-50 text-green-600 transition-all duration-200">
+            <ForestIcon fontSize="medium" />
+          </div>
+          <span className="text-green-600 text-4xl font-bold transition-all duration-200">
+            PeopleFirst
+          </span>
+        </Link>
+      </div>
+
       <motion.div
-        className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 border border-gray-100"
+        className="w-full max-w-lg bg-white rounded-xl shadow-md p-10 border border-gray-100"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <motion.div
-          className="text-center mb-8"
+          className="text-center mb-10"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Join Us</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-4xl font-bold text-black mb-4">Sign Up</h1>
+          <p className="text-lg text-gray-800">
             Create an account to start making an impact
           </p>
         </motion.div>
@@ -175,44 +168,9 @@ const SignUp = () => {
           </motion.div>
 
           <motion.div
-            className="space-y-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-          >
-            <label className="block text-sm font-medium text-gray-700">
-              Profile Picture (Optional)
-            </label>
-            <div className="flex items-center space-x-4">
-              {profilePreview && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-blue-200"
-                >
-                  <img
-                    src={profilePreview}
-                    alt="Profile preview"
-                    className="h-full w-full object-cover"
-                  />
-                </motion.div>
-              )}
-              <div className="flex-1">
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full p-2 text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none cursor-pointer"
-                  accept="image/*"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
             className="pt-2"
           >
             <motion.button
@@ -249,7 +207,7 @@ const SignUp = () => {
           className="mt-6 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.7 }}
         >
           <p className="text-sm text-gray-600">
             Already have an account?{" "}

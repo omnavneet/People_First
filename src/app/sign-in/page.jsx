@@ -3,6 +3,8 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { motion } from "framer-motion"
+import Link from "next/link"
+import ForestIcon from "@mui/icons-material/Forest"
 
 const SignIn = () => {
   const [userName, setUserName] = useState("")
@@ -70,22 +72,33 @@ const SignIn = () => {
   }
 
   return (
-    <div className="flex flex-col py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-green-50 min-h-screen items-center justify-center">
+    <div className="flex flex-col py-4 px-2 sm:px-6 md:px-4 lg:px-8 bg-green-700/10 h-screen items-center justify-center">
+      <div className="absolute top-10 left-16">
+        <Link href="/" className="flex items-center space-x-2 group">
+          <div className="p-2 rounded-full bg-green-50 text-green-600 transition-all duration-200">
+            <ForestIcon fontSize="medium" />
+          </div>
+          <span className="text-green-600 text-4xl font-bold transition-all duration-200">
+            PeopleFirst
+          </span>
+        </Link>
+      </div>
+
       <motion.div
-        className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 border border-gray-100"
+        className="w-full max-w-lg bg-white rounded-xl shadow-md p-16 border border-gray-100"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <motion.div
-          className="text-center mb-8"
+          className="text-center mb-10"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome</h1>
-          <p className="text-lg text-gray-600">
-            Sign in to continue making a difference in your community
+          <h1 className="text-4xl font-bold text-black mb-4">Sign In</h1>
+          <p className="text-lg text-gray-800">
+            Please enter the credentials to access your account.
           </p>
         </motion.div>
 
@@ -167,17 +180,22 @@ const SignIn = () => {
         </form>
 
         <motion.div
-          className="mt-8 flex justify-between items-center"
+          className="mt-6 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.8 }}
         >
-          <button
-            onClick={goToSignUp}
-            className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
-          >
-            Create account
-          </button>
+          <p className="text-sm text-gray-600">
+            Do not have an account?{" "}
+            <motion.button
+              onClick={goToSignUp}
+              className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Sign Up
+            </motion.button>
+          </p>
         </motion.div>
       </motion.div>
     </div>

@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
 
 export default function ProfilePage() {
   const [user, setUser] = useState({
@@ -24,8 +23,6 @@ export default function ProfilePage() {
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
 
-  const router = useRouter()
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -37,35 +34,25 @@ export default function ProfilePage() {
           credentials: "include",
         })
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
         const responseText = await response.text()
 
         if (!responseText) {
           throw new Error("Empty response from server")
         }
-        
+
         let data = {}
         try {
           data = JSON.parse(responseText)
         } catch (jsonError) {
-          console.error("JSON parse error:", jsonError)
-          console.error("Response text:", responseText)
-          throw new Error("Invalid JSON response from server")
-        }
-
-        if (data.error) {
-          throw new Error(data.error)
+          console.log("Response text:", responseText)
         }
 
         const userData = data.user || data
 
         setUser({
-          name: userData.name || userData.username || "User",
+          name: userData.name || "User",
           email: userData.email || "",
-          profilePicture: userData.profilePicture || userData.avatar || null,
+          profilePicture: userData.profilePicture || null,
           createdAt:
             userData.createdAt ||
             userData.created_at ||
@@ -73,12 +60,11 @@ export default function ProfilePage() {
         })
 
         setEditData({
-          name: userData.name || userData.username || "User",
+          name: userData.name || "User",
           email: userData.email || "",
         })
-      } catch (err) {
-        console.error("Error fetching user data:", err)
-        setError(err.message || "Failed to load profile data")
+      } catch (e) {
+        setError("Failed to load profile data")
       } finally {
         setLoading(false)
       }
@@ -174,17 +160,7 @@ export default function ProfilePage() {
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        let errorMessage = "Failed to update profile"
-
-        try {
-          const errorData = JSON.parse(errorText)
-          errorMessage = errorData.error || errorMessage
-        } catch {
-          errorMessage = errorText || errorMessage
-        }
-
-        throw new Error(errorMessage)
+        console.log("Response status:", response.status)
       }
 
       const responseText = await response.text()
@@ -235,24 +211,6 @@ export default function ProfilePage() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-green-50">
-        <div className="text-center text-red-600">
-          <p>{error}</p>
-          <motion.button
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            onClick={() => window.location.reload()}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Retry
-          </motion.button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-green-50 py-4 px-2 sm:px-6 md:px-4 lg:px-8">
       <div className="max-w-4xl mx-auto py-6">
@@ -287,9 +245,8 @@ export default function ProfilePage() {
               >
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 ${
-                      isEditing ? "border-blue-200" : "border-gray-100"
-                    } shadow-md relative`}
+                    className={`w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 ${isEditing ? "border-blue-200" : "border-gray-100"
+                      } shadow-md relative`}
                   >
                     {previewUrl || user.profilePicture ? (
                       <img

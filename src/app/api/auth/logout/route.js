@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function POST(req) {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
 
   // Clear the auth token
   cookieStore.set("auth_token", "", {

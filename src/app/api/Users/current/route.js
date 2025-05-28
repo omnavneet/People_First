@@ -6,7 +6,7 @@ import { NextResponse } from "next/server"
 
 export async function GET(req) {
   await connectionDB()
-  
+
   const cookie = (await cookies(req)).get("auth_token")
   const token = cookie?.value
 
@@ -18,12 +18,12 @@ export async function GET(req) {
       token,
       new TextEncoder().encode(process.env.JWT_SECRET)
     )
-    
+
     const { _id } = payload
     const id = _id
 
     const user = await User.findById(id)
-    
+
     if (!user) {
       return NextResponse.json({ error: "User not found" })
     }
