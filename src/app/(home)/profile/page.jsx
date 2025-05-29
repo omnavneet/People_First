@@ -153,26 +153,36 @@ export default function ProfilePage() {
         formData.append("profilePicture", selectedFile)
       }
 
-      const response = await fetch("/api/Users/update", {
-        method: "POST",
+      // Get current user ID first
+      const currentUserResponse = await fetch("/api/Users/current", {
+        method: "GET",
+        credentials: "include",
+      })
+
+      if (!currentUserResponse.ok) {
+        throw new Error("Failed to get current user")
+      }
+
+      const currentUserData = await currentUserResponse.json()
+      const userId = currentUserData._id || currentUserData.user?._id
+
+      if (!userId) {
+        throw new Error("User ID not found")
+      }
+
+      // Update user profile using the consolidated API
+      const response = await fetch(`/api/Users/${userId}`, {
+        method: "PUT",
         credentials: "include",
         body: formData,
       })
 
       if (!response.ok) {
-        console.log("Response status:", response.status)
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to update profile")
       }
 
-      const responseText = await response.text()
-      let data = {}
-
-      if (responseText) {
-        try {
-          data = JSON.parse(responseText)
-        } catch (jsonError) {
-          console.warn("Non-JSON response:", responseText)
-        }
-      }
+      const data = await response.json()
 
       // Update the local user state
       const updatedUser = {
@@ -186,6 +196,8 @@ export default function ProfilePage() {
       if (data.user) {
         updatedUser.profilePicture =
           data.user.profilePicture || updatedUser.profilePicture
+        updatedUser.name = data.user.name || updatedUser.name
+        updatedUser.email = data.user.email || updatedUser.email
       }
 
       setUser(updatedUser)
@@ -199,7 +211,6 @@ export default function ProfilePage() {
       setIsSaving(false)
     }
   }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-green-50">
@@ -245,8 +256,9 @@ export default function ProfilePage() {
               >
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 ${isEditing ? "border-blue-200" : "border-gray-100"
-                      } shadow-md relative`}
+                    className={`w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 ${
+                      isEditing ? "border-blue-200" : "border-gray-100"
+                    } shadow-md relative`}
                   >
                     {previewUrl || user.profilePicture ? (
                       <img
