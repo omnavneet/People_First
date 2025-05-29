@@ -1,6 +1,6 @@
 # PeopleFirst 🚀
 
-**PeopleFirst** is a socially impactful platform aimed at streamlining the way individuals discover, verify, and contribute to real-world events and initiatives. Designed to ensure legitimacy and user trust, PeopleFirst empowers communities through technology.
+**PeopleFirst** lets you donate to verified requests, volunteer at local events, and stay updated with real-time disaster news—all backed by AI to ensure legitimacy. It’s an easy way to help and stay connected with your community.
 
 ---
 
@@ -9,8 +9,7 @@
 ### 🏠 Landing Page
 ![Landing Page](public/Landing.png)
 
-### 🔐 Sign In & Sign Up
-![Sign In Page](public/Sign_In.png)
+### 🔐 Sign Up
 ![Sign Up Page](public/Sign_Up.png)
 
 ### 🧾 Dashboard
@@ -62,15 +61,12 @@
 
 ## 🚧 Planned Improvements
 
- 🗺️ Map integration to show nearby hospitals and shelters using Google Maps API
-
- 🛠️ Admin panel to verify, approve, or reject event requests
-
- 🔔 Notification system:
-    * For volunteers when a new relevant event/request is created
-    * For requesters when their request gets a donation
-
- 🧹 Improved dashboard UI with filters and sorting 
+- 🗺️ Map integration to show nearby hospitals and shelters using Google Maps API  
+- 🛠️ Admin panel to verify, approve, or reject event requests  
+- 🔔 Notification system:  
+  * For volunteers when a new relevant event/request is created  
+  * For requesters when their request gets a donation  
+- 🧹 Improved dashboard UI with filters and sorting  
 
 ---
 
@@ -81,7 +77,7 @@
 git clone https://github.com/omnavneet/People_First.git
 
 # Go into the folder
-cd peoplefirst
+cd People_First
 
 # Install dependencies
 npm install
